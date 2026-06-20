@@ -1,6 +1,7 @@
 {
   "tasks": {
-    "dev": "zx index.mts"
+    "analyze": "zx analyze/index.mts",
+    "apply": "zx apply/index.mts"
   },
   "imports": {
     "@std/assert": "jsr:@std/assert@1",

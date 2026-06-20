@@ -1,7 +1,7 @@
 #!/usr/bin/env zx
 /// <reference types="zx/globals" />
 
-export interface Config {
+export interface AnalysisConfig {
 	imageDir: string
 	lightnessStep: number
 	chromaStep: number
@@ -32,18 +32,12 @@ export class ImageAnalysisData {
 	}
 }
 
-export async function setupConfig(configDir: string) {	
-	const defaultConfig : Config = {
-		imageDir: `${os.homedir()}/Pictures`, 
-		lightnessStep: 10, 
-		chromaStep: 1, 
-		hueStep: 90,
-		preAnalysisCommands: []
-	}
-
-	await fs.writeFile(`${configDir}/config.json`, JSON.stringify(defaultConfig))
-	console.info(`Generated default config at ${configDir}/config.json!`)
-	return JSON.stringify(defaultConfig)
+export const defaultConfig = {	
+	imageDir: `${os.homedir()}/Pictures`, 
+	lightnessStep: 10, 
+	chromaStep: 1, 
+	hueStep: 90,
+	preAnalysisCommands: []
 }
 
 export async function runPreAnalysis(hooks: string[]) {
