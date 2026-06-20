@@ -19,13 +19,11 @@ export class ImageAnalysisData {
 		this.chromaData = []
 		this.hueData = []
 
-		for (let i = 0; i < 1; i += lightnessStep) {
-			i = roundToStep(i, lightnessStep)      // mitigate floating point precision errors
+		for (let i = 0; i < 100; i += lightnessStep) {
 			this.lightnessData.push({ lightness: i, paths: [] })
 		}
 
-		for (let i = 0; i < 1; i += chromaStep) {
-			i = roundToStep(i, chromaStep)
+		for (let i = 0; i < 100; i += chromaStep) {
 			this.chromaData.push({ chroma: i, paths: [] })
 		}
 		for (let i = 0; i < 360; i += hueStep) {
@@ -34,32 +32,31 @@ export class ImageAnalysisData {
 	}
 }
 
-export function setupConfig(configDir: string) {	
+export async function setupConfig(configDir: string) {	
 	const defaultConfig : Config = {
 		imageDir: `${os.homedir()}/Pictures`, 
-		lightnessStep: 0.1, 
-		chromaStep: 0.01, 
+		lightnessStep: 10, 
+		chromaStep: 1, 
 		hueStep: 90,
 		preAnalysisCommands: []
 	}
 
-	fs.writeFile(`${configDir}/config.jsonc`, JSON.stringify(defaultConfig))
-	console.info(`Generated default config at ${configDir}/config.jsonc!`)
-	return defaultConfig
+	await fs.writeFile(`${configDir}/config.json`, JSON.stringify(defaultConfig))
+	console.info(`Generated default config at ${configDir}/config.json!`)
+	return JSON.stringify(defaultConfig)
 }
 
-export function runPreAnalysis(hooks: string[]) {
-	hooks.forEach(async (hook) => {
-		await $`${hook}` // Scary!
-	})
+export async function runPreAnalysis(hooks: string[]) {
+	for await (const hook of hooks) {
+		await $`eval ${hook}` // Scary!
+	}
 }
 
 export async function analyzeImages(imageDir: string, analysisOutput: ImageAnalysisData, outputPath: string, lightnessStep: number, chromaStep: number, hueStep: number) {
 	const images = await fs.promises.opendir(`${imageDir}`)
-	// await fs.rm(`${}/cache.json`)
 
 	for await (const image of images) {
-		const path = imageDir + image.name
+		const path = `${imageDir}/${image.name}`
 		const stat = await fs.promises.stat(path)
 		if (stat.isFile()) {
 			let output =
@@ -104,8 +101,8 @@ export async function analyzeImages(imageDir: string, analysisOutput: ImageAnaly
 			console.log(
 				`Got oklch(${dominantColour}) as dominant colour of ${image.name}!`,
 			)
-			const lightness = Number(dominantColour[0])
-			const chroma = Number(dominantColour[1])
+			const lightness = Number(dominantColour[0]) * 100
+			const chroma = Number(dominantColour[1]) * 100
 			const hue = Number(dominantColour[2])
 
 			analysisOutput.lightnessData.forEach((n) => {
@@ -133,7 +130,7 @@ export async function analyzeImages(imageDir: string, analysisOutput: ImageAnaly
 			})
 
 			// flush every time we finish analyzing a file, because it just takes so long
-			fs.writeFile(outputPath, JSON.stringify(analysisOutput), (err: Error) => {
+			fs.writeFile(outputPath, JSON.stringify(analysisOutput, null, 4), (err: Error) => {
 				if (err) throw new Error(err.message)
 			})
 		}
@@ -142,8 +139,4 @@ export async function analyzeImages(imageDir: string, analysisOutput: ImageAnaly
 
 function floorToStep(num: number, step: number) {
 	return Math.floor(num / step) * step
-}
-
-function roundToStep(num: number, step: number) {
-	return Math.round(num / step) * step
 }
