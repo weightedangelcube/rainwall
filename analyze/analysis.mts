@@ -1,4 +1,7 @@
 #!/usr/bin/env zx
+
+import { floorToStep } from "../utils.mts";
+
 /// <reference types="zx/globals" />
 
 export interface AnalysisConfig {
@@ -32,10 +35,10 @@ export class ImageAnalysisData {
 	}
 }
 
-export const defaultConfig: AnalysisConfig = {	
-	imageDir: `${os.homedir()}/Pictures`, 
-	lightnessStep: 10, 
-	chromaStep: 1, 
+export const defaultConfig: AnalysisConfig = {
+	imageDir: `${os.homedir()}/Pictures`,
+	lightnessStep: 10,
+	chromaStep: 1,
 	hueStep: 90,
 	preAnalysisCommands: []
 }
@@ -131,6 +134,3 @@ export async function analyzeImages(imageDir: string, analysisOutput: ImageAnaly
 	}
 }
 
-function floorToStep(num: number, step: number) {
-	return Math.floor(num / step) * step
-}
