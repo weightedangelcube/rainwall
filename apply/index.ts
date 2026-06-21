@@ -53,9 +53,7 @@ const lightnessValue = map(
 	config.lightnessRange.end,
 )
 
-console.info(`Got hue value ${hueValue}°!`)
-console.info(`Got chroma value ${chromaValue}%!`)
-console.info(`Got lightness value ${lightnessValue}%!`)
+console.info(`Calculated target colour oklch(${lightnessValue} ${chromaValue} ${hueValue})!`)
 
 console.debug(`Trying to open cache file ${pathToCache}...`)
 const cacheFile = await fs.promises.readFile(`${pathToCache}`, {

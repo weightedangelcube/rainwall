@@ -72,7 +72,7 @@ export async function analyzeImages(imageDir: string, analysisOutput: ImageAnaly
 			const chroma = Number(dominantColour[1])
 			const hue = Number(dominantColour[2])
 
-			analysisOutput.files.push({ path: path, oklch: [hue, chroma, lightness] })
+			analysisOutput.files.push({ path: path, oklch: [lightness, chroma, hue] })
 
 			// flush every time we finish analyzing a file, because it just takes so long
 			fs.writeFile(outputPath, JSON.stringify(analysisOutput, null, 4), (err: Error) => {

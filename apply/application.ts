@@ -82,8 +82,8 @@ export function findMatchingImages(
 	chromaValue: number,
 	lightnessValue: number,
 ) {
-	const targetColour = [hueValue, chromaValue, lightnessValue]
-	let closestColour = { path: "", oklch: [-1, -1, -1] }
+	const targetColour = [lightnessValue, chromaValue, hueValue]
+	let closestColour = imagesData.files[0]
 
 	for (const file of imagesData.files) {
 		if (
@@ -94,5 +94,7 @@ export function findMatchingImages(
 			closestColour = file
 		}
 	}
+	console.info(`Found target image ${closestColour.path} with colour oklch(${closestColour.oklch[0]} ${closestColour.oklch[1]} ${closestColour.oklch[2]})!`)
+
 	return closestColour
 }
