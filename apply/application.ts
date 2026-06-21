@@ -1,4 +1,4 @@
-import { ImageAnalysisData } from "../analyze/analysis.ts"
+import type { ImageAnalysisData } from "../analyze/analysis.ts"
 
 export interface ApplicationConfig {
 	latitude: number
