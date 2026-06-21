@@ -16,11 +16,11 @@ export const defaultConfig: ApplicationConfig = {
 	weatherModel: "best_match",
 	lightnessRange: {
 		start: 0,
-		end: 100,
+		end: 1,
 	},
 	chromaRange: {
 		start: 0,
-		end: 100,
+		end: 1,
 	},
 	hueRange: {
 		start: 0,

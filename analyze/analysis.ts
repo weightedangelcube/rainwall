@@ -68,8 +68,8 @@ export async function analyzeImages(imageDir: string, analysisOutput: ImageAnaly
 			console.log(
 				`Got oklch(${dominantColour}) as dominant colour of ${image.name}!`,
 			)
-			const lightness = Number(dominantColour[0]) * 100
-			const chroma = Number(dominantColour[1]) * 100
+			const lightness = Number(dominantColour[0])
+			const chroma = Number(dominantColour[1])
 			const hue = Number(dominantColour[2])
 
 			analysisOutput.files.push({ path: path, oklch: [hue, chroma, lightness] })
