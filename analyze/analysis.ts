@@ -22,7 +22,7 @@ export async function runPreAnalysis(hooks: string[]) {
 }
 
 export async function analyzeImages(imageDir: string, analysisOutput: ImageAnalysisData, outputPath: string) {
-	const images = await fs.promises.opendir(`${imageDir}`)
+	const images = await fs.promises.opendir(imageDir)
 
 	for await (const image of images) {
 		const path = `${imageDir}/${image.name}`

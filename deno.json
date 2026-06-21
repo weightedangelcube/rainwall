@@ -1,7 +1,7 @@
 {
   "tasks": {
-    "compile-analyze": "deno compile --output build/analyze -A analyze/index.ts",
-    "compile-apply": "deno compile --output build/apply -A apply/index.ts",
+    "compile-analyze": "deno compile --output build/rainwall-analyze -A analyze/index.ts",
+    "compile-apply": "deno compile --output build/rainwall-apply -A apply/index.ts",
     "analyze": "deno run -A analyze/index.ts",
     "apply": "deno run -A apply/index.ts"
   },
