@@ -6,7 +6,6 @@ export interface ApplicationConfig {
 	weatherModel: string
 	lightnessRange: { start: number; end: number }
 	chromaRange: { start: number; end: number }
-	hueRange: { start: number; end: number }
 	applyWallpaperCommand: string
 }
 
@@ -21,10 +20,6 @@ export const defaultConfig: ApplicationConfig = {
 	chromaRange: {
 		start: 0,
 		end: 1,
-	},
-	hueRange: {
-		start: 0,
-		end: 360,
 	},
 	applyWallpaperCommand: "hyprctl hyprpaper wallpaper , %s",
 }
