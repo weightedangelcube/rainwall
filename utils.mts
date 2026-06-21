@@ -1,4 +1,3 @@
-
 export const configDir = process.env.XDG_CONFIG_HOME
 	? `${process.env.XDG_CONFIG_HOME}/rainwall`
 	: `${os.homedir()}/.config/rainwall`
@@ -18,11 +17,11 @@ export async function loadConfig(pathToConfig: string, defaultConfig: object) {
 	let config: object | undefined
 	try {
 		const stringConfig = await fs.promises.readFile(`${pathToConfig}`, {
-			encoding: "utf8"
+			encoding: "utf8",
 		})
 		if (stringConfig == undefined) {
 			console.warn(
-				`Current config blank, generating a new one... you may need to stop this process and edit the config file.`
+				`Current config blank, generating a new one... you may need to stop this process and edit the config file.`,
 			)
 			config = defaultConfig
 			writeDefaultConfig(pathToConfig, defaultConfig)
@@ -33,7 +32,7 @@ export async function loadConfig(pathToConfig: string, defaultConfig: object) {
 		console.warn(
 			`Got ${
 				(err as Error).message
-			} when trying to load config, generating a new one... you may need to stop this process and edit the config file.`
+			} when trying to load config, generating a new one... you may need to stop this process and edit the config file.`,
 		)
 		config = defaultConfig
 		writeDefaultConfig(pathToConfig, defaultConfig)
@@ -47,14 +46,26 @@ async function writeDefaultConfig(path: string, data: object) {
 	console.info(`Generated default config at ${path}!`)
 }
 
-export function floorToStep(num: number, step: number) {
-	return Math.floor(num / step) * step
-}
-
 export function clamp(number: number, min: number, max: number) {
 	return Math.max(min, Math.min(number, max))
 }
 
 export function map(number: number, min: number, max: number, newMin: number, newMax: number) {
-	return (((number - min) / (max - min)) * (newMax - newMin)) + newMin
+	return ((number - min) / (max - min)) * (newMax - newMin) + newMin
+}
+
+export function mapEaseInExpo(number: number, min: number, max: number, newMin: number, newMax: number) {
+	return easeInExpo((number - min) / (max - min)) * (newMax - newMin) + newMin
+}
+
+export function mapEaseOutExpo(number: number, min: number, max: number, newMin: number, newMax: number) {
+	return easeOutExpo((number - min) / (max - min)) * (newMax - newMin) + newMin
+}
+
+function easeInExpo(x: number): number {
+	return x === 0 ? 0 : Math.pow(2, 10 * x - 10)
+}
+
+function easeOutExpo(x: number): number {
+	return x === 1 ? 1 : 1 - Math.pow(2, -10 * x)
 }

@@ -1,13 +1,12 @@
 #!/usr/bin/env zx
 /// <reference types="zx/globals" />
 
-import { AnalysisConfig, defaultConfig as analysisDefaultConfig, ImageAnalysisData } from "../analyze/analysis.mts"
-import { cacheDir, configDir, floorToStep, loadConfig, map } from "../utils.mts"
+import { ImageAnalysisData } from "../analyze/analysis.mts"
+import { cacheDir, configDir, loadConfig, map, mapEaseInExpo, mapEaseOutExpo } from "../utils.mts"
 import { ApplicationConfig, defaultConfig, findMatchingImages, getOpenMeteoData } from "./application.mts"
 import * as SunCalc from "npm:suncalc"
 
 const pathToConfig = `${configDir}/apply-config.json`
-const pathToAnalysisConfig = `${configDir}/analyze-config.json`
 const pathToCache = `${cacheDir}/analysis.json`
 
 console.debug(`Trying to load application config from ${pathToConfig}...`)
@@ -18,18 +17,6 @@ const config = await loadConfig(
 if (config == undefined) {
 	throw new Error("Couldn't initialize config!")
 }
-
-// we also need the analysis config to load the steps
-console.debug(`Trying to load analysis config from ${pathToAnalysisConfig}...`)
-const analysisConfig = await loadConfig(
-	pathToAnalysisConfig,
-	analysisDefaultConfig,
-) as AnalysisConfig
-if (analysisConfig == undefined) {
-	throw new Error("Couldn't initialize config!")
-}
-
-console.debug(`Config: \n${JSON.stringify(config, null, 4)}`)
 
 const openMeteoData = await getOpenMeteoData(
 	config.latitude,
@@ -48,31 +35,27 @@ console.info(
 )
 console.info(`Current sun altitude is ${sunCalcData.altitude}°!`)
 
-// const hueValue = clamp()
-const chromaValue = floorToStep(
-	map(
-		Number(openMeteoData.cloudCover),
-		0,
-		100,
-		config.chromaRange.end,
-        config.chromaRange.start,
-	),
-	analysisConfig.chromaStep,
+const hueValue = Number(sunCalcData.altitude) >= 0
+	? mapEaseOutExpo(Number(sunCalcData.altitude), 0, 90, 0, 264)
+	: mapEaseInExpo(Number(sunCalcData.altitude), 0, -90, 360, 264)
+const chromaValue = map(
+	Number(openMeteoData.cloudCover),
+	0,
+	100,
+	config.chromaRange.end,
+	config.chromaRange.start,
+)
+const lightnessValue = map(
+	Number(openMeteoData.shortwaveRadiation),
+	0,
+	1000,
+	config.lightnessRange.start,
+	config.lightnessRange.end,
 )
 
-const lightnessValue = floorToStep(
-	map(
-		Number(openMeteoData.shortwaveRadiation),
-		0,
-		1000,
-		config.lightnessRange.start,
-		config.lightnessRange.end,
-	),
-	analysisConfig.lightnessStep,
-)
-
-console.info(`Got chroma value ${chromaValue}!`)
-console.info(`Got lightness value ${lightnessValue}!`)
+console.info(`Got hue value ${hueValue}°!`)
+console.info(`Got chroma value ${chromaValue}%!`)
+console.info(`Got lightness value ${lightnessValue}%!`)
 
 console.debug(`Trying to open cache file ${pathToCache}...`)
 const cacheFile = await fs.promises.readFile(`${pathToCache}`, {
@@ -81,6 +64,8 @@ const cacheFile = await fs.promises.readFile(`${pathToCache}`, {
 const imagesData = JSON.parse(cacheFile) as ImageAnalysisData
 console.debug(`Opened cache file ${pathToCache}!`)
 
+const targetFile = findMatchingImages(imagesData, hueValue, chromaValue, lightnessValue)
 
-
-findMatchingImages(imagesData, 0, chromaValue, lightnessValue)
+console.info(`Found target image ${targetFile.path}!`)
+console.info(`Setting wallpaper...`)
+await $`eval ${config.applyWallpaperCommand.replace("%s", targetFile.path)}`

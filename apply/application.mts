@@ -1,7 +1,6 @@
 #!/usr/bin/env zx
 
 import { ImageAnalysisData } from "../analyze/analysis.mts"
-import _ from "npm:underscore"
 
 /// <reference types="zx/globals" />
 
@@ -85,23 +84,17 @@ export function findMatchingImages(
 	chromaValue: number,
 	lightnessValue: number,
 ) {
-	let result = []
-	let i = 0
-	const chromaIndex = imagesData.chromaData.indexOf(
-		imagesData.chromaData.find((data) => data.chroma === chromaValue)!,
-	)
-	const lightnessIndex = imagesData.lightnessData.indexOf(
-		imagesData.lightnessData.find((data) => data.lightness === lightnessValue)!,
-	)
+	const targetColour = [hueValue, chromaValue, lightnessValue]
+	let closestColour = { path: "", oklch: [0, 0, 0] }
 
-	do {
-		const matches = [
-			imagesData.chromaData[chromaIndex + i].paths || imagesData.chromaData[chromaIndex - i].paths,
-			imagesData.lightnessData[lightnessIndex + i].paths || imagesData.lightnessData[lightnessIndex - i].paths,
-		]
-		console.log(matches)
-		result = matches.reduce((a, b) => a.filter((c) => b.includes(c)))
-
-		i++
-	} while (result.length === 0)
+	for (const file of imagesData.files) {
+		if (
+			Math.abs(file.oklch[0] - targetColour[0]) <= Math.abs(closestColour.oklch[0] - targetColour[0]) &&
+			Math.abs(file.oklch[1] - targetColour[1]) <= Math.abs(closestColour.oklch[1] - targetColour[1]) &&
+			Math.abs(file.oklch[2] - targetColour[2]) <= Math.abs(closestColour.oklch[2] - targetColour[2])
+		) {
+			closestColour = file
+		}
+	}
+	return closestColour
 }
