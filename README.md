@@ -3,8 +3,16 @@
 
 **rainwall is a program to set your wallpaper based on the weather outside.**
 
+## but how?
+This application uses ImageMagick to identify the dominant colour of an image using the Kmeans algorithm in the Oklch colourspace. Once a dominant colour is found, a wallpaper is chosen by identifying the current shortwave radiation, cloud cover, and sun angle, which correspond to lightness, chroma, and hue respectively. 
+
 ## dependencies
 - [ImageMagick](https://imagemagick.org)
+
+## installing
+First, install [ImageMagick](https://imagemagick.org) using your method of choice. Then download the binary from [Releases on GitHub](https://github.com/weightedangelcube/rainwall/releases), or get it from [JSR](https://jsr.io/@angelcube/rainwall/).
+
+Alternatively, if you are using Arch Linux, you can use the PKGBUILD in the repository root to do both for you.
 
 ## usage
 1. Give both `rainwall-analyze` and `rainwall-apply` an initial run to generate the config files, then edit the config files as needed. See below for configuration options.
@@ -61,3 +69,4 @@ Launch Automator. Click New Document → Choose. From the "Files & Folders" libr
 - Windows ❌
     - [ ] How does one set the wallpaper via CLI?
     - [ ] `apply/index.ts @ L80, analyze/analysis.ts @ L20`: equivalent of POSIX eval?
+
