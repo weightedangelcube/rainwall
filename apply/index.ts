@@ -1,10 +1,10 @@
 #!/usr/bin/env zx
-/// <reference types="zx/globals" />
 
-import { ImageAnalysisData } from "../analyze/analysis.mts"
-import { cacheDir, configDir, loadConfig, map, mapEaseInExpo, mapEaseOutExpo } from "../utils.mts"
-import { ApplicationConfig, defaultConfig, findMatchingImages, getOpenMeteoData } from "./application.mts"
-import * as SunCalc from "npm:suncalc"
+import { ImageAnalysisData } from "../analyze/analysis.ts"
+import { cacheDir, configDir, loadConfig, map, mapEaseInExpo, mapEaseOutExpo } from "../utils.ts"
+import { ApplicationConfig, defaultConfig, findMatchingImages, getOpenMeteoData } from "./application.ts"
+import * as SunCalc from "suncalc"
+import "zx/globals"
 
 const pathToConfig = `${configDir}/apply-config.json`
 const pathToCache = `${cacheDir}/analysis.json`

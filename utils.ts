@@ -1,3 +1,5 @@
+import "zx/globals"
+
 export const configDir = process.env.XDG_CONFIG_HOME
 	? `${process.env.XDG_CONFIG_HOME}/rainwall`
 	: `${os.homedir()}/.config/rainwall`

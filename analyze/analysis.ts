@@ -1,6 +1,5 @@
 #!/usr/bin/env zx
-
-/// <reference types="zx/globals" />
+import "zx/globals"
 
 export interface AnalysisConfig {
 	imageDir: string

@@ -2,9 +2,8 @@
   "version": "5",
   "specifiers": {
     "jsr:@std/assert@1": "1.0.19",
-    "jsr:@std/internal@^1.0.12": "1.0.12",
-    "npm:suncalc@2": "2.0.0",
-    "npm:zx@^8.8.5": "8.8.5"
+    "jsr:@std/internal@^1.0.12": "1.0.14",
+    "npm:suncalc@2": "2.0.0"
   },
   "jsr": {
     "@std/assert@1.0.19": {
@@ -13,24 +12,23 @@
         "jsr:@std/internal"
       ]
     },
-    "@std/internal@1.0.12": {
-      "integrity": "972a634fd5bc34b242024402972cd5143eac68d8dffaca5eaa4dba30ce17b027"
+    "@std/internal@1.0.14": {
+      "integrity": "291516b3d4c35024d6ffbc0a9df5bf4c64116e05b50012cf846710152d2ffdf7"
     }
   },
   "npm": {
     "suncalc@2.0.0": {
       "integrity": "sha512-RcO28GOMXNnB+sr+c7/+zv5UPMa9wxIsUVGE3HddjQykqCVEC2rc4t4IjBB7qaa7K7dx5Cxp8UZwexyXrX8JkA=="
-    },
-    "zx@8.8.5": {
-      "integrity": "sha512-SNgDF5L0gfN7FwVOdEFguY3orU5AkfFZm9B5YSHog/UDHv+lvmd82ZAsOenOkQixigwH2+yyH198AwNdKhj+RA==",
-      "bin": true
     }
   },
   "workspace": {
     "dependencies": [
-      "jsr:@std/assert@1",
-      "npm:suncalc@2",
-      "npm:zx@^8.8.5"
-    ]
+      "jsr:@std/assert@1"
+    ],
+    "packageJson": {
+      "dependencies": [
+        "npm:suncalc@2"
+      ]
+    }
   }
 }

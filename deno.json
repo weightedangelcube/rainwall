@@ -1,12 +1,10 @@
 {
   "tasks": {
-    "analyze": "zx analyze/index.mts",
-    "apply": "zx apply/index.mts"
+    "analyze": "zx analyze/index.ts",
+    "apply": "zx apply/index.ts"
   },
   "imports": {
-    "@std/assert": "jsr:@std/assert@1",
-    "suncalc": "npm:suncalc@^2.0.0",
-    "zx": "npm:zx@^8.8.5"
+    "@std/assert": "jsr:@std/assert@1"
   },
 	"fmt": { "semiColons": false, "indentWidth": 4, "useTabs": true, "lineWidth": 120 }
 }

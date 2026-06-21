@@ -1,8 +1,8 @@
 #!/usr/bin/env zx
-/// <reference types="zx/globals" />
 
-import { cacheDir, configDir, loadConfig } from "../utils.mts"
-import { AnalysisConfig, analyzeImages, defaultConfig, ImageAnalysisData, runPreAnalysis } from "./analysis.mts"
+import { cacheDir, configDir, loadConfig } from "../utils.ts"
+import { AnalysisConfig, analyzeImages, defaultConfig, ImageAnalysisData, runPreAnalysis } from "./analysis.ts"
+import "zx/globals"
 
 const pathToConfig = `${configDir}/analyze-config.json`
 

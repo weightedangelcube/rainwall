@@ -1,8 +1,4 @@
-#!/usr/bin/env zx
-
-import { ImageAnalysisData } from "../analyze/analysis.mts"
-
-/// <reference types="zx/globals" />
+import { ImageAnalysisData } from "../analyze/analysis.ts"
 
 export interface ApplicationConfig {
 	latitude: number
