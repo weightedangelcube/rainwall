@@ -5,6 +5,7 @@
   },
   "imports": {
     "@std/assert": "jsr:@std/assert@1",
+    "suncalc": "npm:suncalc@^2.0.0",
     "zx": "npm:zx@^8.8.5"
   }
 }

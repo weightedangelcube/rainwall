@@ -32,7 +32,7 @@ export class ImageAnalysisData {
 	}
 }
 
-export const defaultConfig = {	
+export const defaultConfig: AnalysisConfig = {	
 	imageDir: `${os.homedir()}/Pictures`, 
 	lightnessStep: 10, 
 	chromaStep: 1, 
