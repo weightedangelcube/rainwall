@@ -56,18 +56,10 @@ export function map(number: number, min: number, max: number, newMin: number, ne
 	return ((number - min) / (max - min)) * (newMax - newMin) + newMin
 }
 
-export function mapEaseInExpo(number: number, min: number, max: number, newMin: number, newMax: number) {
-	return easeInExpo((number - min) / (max - min)) * (newMax - newMin) + newMin
+function easeOutQuint(x: number): number {
+	return 1 - Math.pow(1 - x, 5)
 }
 
-export function mapEaseOutExpo(number: number, min: number, max: number, newMin: number, newMax: number) {
-	return easeOutExpo((number - min) / (max - min)) * (newMax - newMin) + newMin
-}
-
-function easeInExpo(x: number): number {
-	return x === 0 ? 0 : Math.pow(2, 10 * x - 10)
-}
-
-function easeOutExpo(x: number): number {
-	return x === 1 ? 1 : 1 - Math.pow(2, -10 * x)
+export function mapEaseOutQuint(number: number, min: number, max: number, newMin: number, newMax: number) {
+	return easeOutQuint((number - min) / (max - min)) * (newMax - newMin) + newMin
 }

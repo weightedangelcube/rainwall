@@ -1,7 +1,7 @@
 #!/usr/bin/env zx
 
 import { ImageAnalysisData } from "../analyze/analysis.ts"
-import { cacheDir, configDir, loadConfig, map, mapEaseInExpo, mapEaseOutExpo } from "../utils.ts"
+import { cacheDir, configDir, loadConfig, map, mapEaseOutQuint } from "../utils.ts"
 import { ApplicationConfig, defaultConfig, findMatchingImages, getOpenMeteoData } from "./application.ts"
 import * as SunCalc from "suncalc"
 import "zx/globals"
@@ -23,8 +23,18 @@ const openMeteoData = await getOpenMeteoData(
 	config.longitude,
 	config.weatherModel,
 )
-const sunCalcData = SunCalc.getPosition(
+const currentSunData = SunCalc.getPosition(
 	new Date(),
+	config.latitude,
+	config.longitude,
+)
+const zenithSunData = SunCalc.getPosition(
+	SunCalc.getTimes(new Date(), config.latitude, config.longitude).solarNoon,
+	config.latitude,
+	config.longitude,
+)
+const nadirSunData = SunCalc.getPosition(
+	SunCalc.getTimes(new Date(), config.latitude, config.longitude).nadir,
 	config.latitude,
 	config.longitude,
 )
@@ -33,18 +43,20 @@ console.info(`Current cloud cover percentage is ${openMeteoData.cloudCover}%!`)
 console.info(
 	`Current shortwave radiation is ${openMeteoData.shortwaveRadiation} W/m²!`,
 )
-console.info(`Current sun altitude is ${sunCalcData.altitude}°!`)
+console.info(`Current sun altitude is ${currentSunData.altitude}°!`)
 
-const hueValue = Number(sunCalcData.altitude) >= 0
-	? mapEaseOutExpo(Number(sunCalcData.altitude), 0, 90, 0, 264)
-	: mapEaseInExpo(Number(sunCalcData.altitude), 0, -90, 360, 264)
+const hueValue = Number(currentSunData.altitude) >= -0.833
+	? mapEaseOutQuint(Number(currentSunData.altitude), -0.833, zenithSunData.altitude, 0, 264)
+	: mapEaseOutQuint(Number(currentSunData.altitude), nadirSunData.altitude, -0.833, 264, 360)
+	
 const chromaValue = map(
-	Number(openMeteoData.cloudCover),
+	100 - Number(openMeteoData.cloudCover), // gotta invert this one
 	0,
 	100,
-	config.chromaRange.end,
 	config.chromaRange.start,
+	config.chromaRange.end,
 )
+
 const lightnessValue = map(
 	Number(openMeteoData.shortwaveRadiation),
 	0,
@@ -64,6 +76,6 @@ console.debug(`Opened cache file ${pathToCache}!`)
 
 const targetFile = findMatchingImages(imagesData, hueValue, chromaValue, lightnessValue)
 
-console.info(`Found target image ${targetFile.path}!`)
 console.info(`Setting wallpaper...`)
 await $`eval ${config.applyWallpaperCommand.replace("%s", targetFile.path)}`
+console.info(`Success! Enjoy :)`)
