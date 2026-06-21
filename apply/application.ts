@@ -44,6 +44,8 @@ export async function getOpenMeteoData(
 				models: weatherModel,
 				current: "cloud_cover",
 				minutely_15: "shortwave_radiation_instant",
+				forecast_minutely_15: "1",
+				past_minutely_15: "1"
 			}),
 		},
 	)
@@ -81,7 +83,7 @@ export function findMatchingImages(
 	lightnessValue: number,
 ) {
 	const targetColour = [hueValue, chromaValue, lightnessValue]
-	let closestColour = { path: "", oklch: [0, 0, 0] }
+	let closestColour = { path: "", oklch: [-1, -1, -1] }
 
 	for (const file of imagesData.files) {
 		if (

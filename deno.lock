@@ -3,7 +3,8 @@
   "specifiers": {
     "jsr:@std/assert@1": "1.0.19",
     "jsr:@std/internal@^1.0.12": "1.0.14",
-    "npm:suncalc@2": "2.0.0"
+    "npm:suncalc@2": "2.0.0",
+    "npm:zx@^8.8.5": "8.8.5"
   },
   "jsr": {
     "@std/assert@1.0.19": {
@@ -19,6 +20,10 @@
   "npm": {
     "suncalc@2.0.0": {
       "integrity": "sha512-RcO28GOMXNnB+sr+c7/+zv5UPMa9wxIsUVGE3HddjQykqCVEC2rc4t4IjBB7qaa7K7dx5Cxp8UZwexyXrX8JkA=="
+    },
+    "zx@8.8.5": {
+      "integrity": "sha512-SNgDF5L0gfN7FwVOdEFguY3orU5AkfFZm9B5YSHog/UDHv+lvmd82ZAsOenOkQixigwH2+yyH198AwNdKhj+RA==",
+      "bin": true
     }
   },
   "workspace": {
@@ -27,7 +32,8 @@
     ],
     "packageJson": {
       "dependencies": [
-        "npm:suncalc@2"
+        "npm:suncalc@2",
+        "npm:zx@^8.8.5"
       ]
     }
   }
