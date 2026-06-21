@@ -3,6 +3,8 @@
   "specifiers": {
     "jsr:@std/assert@1": "1.0.19",
     "jsr:@std/internal@^1.0.12": "1.0.14",
+    "jsr:@std/internal@^1.0.14": "1.0.14",
+    "jsr:@std/path@^1.1.5": "1.1.5",
     "npm:suncalc@2": "2.0.0",
     "npm:zx@^8.8.5": "8.8.5"
   },
@@ -39,6 +41,7 @@
     ],
     "packageJson": {
       "dependencies": [
+        "npm:chalk@^5.6.2",
         "npm:suncalc@2",
         "npm:zx@^8.8.5"
       ]

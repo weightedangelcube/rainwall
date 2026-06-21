@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "chalk": "^5.6.2",
     "suncalc": "^2.0.0",
     "zx": "^8.8.5"
   }
