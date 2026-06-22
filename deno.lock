@@ -5,6 +5,8 @@
     "jsr:@std/internal@^1.0.12": "1.0.14",
     "jsr:@std/internal@^1.0.14": "1.0.14",
     "jsr:@std/path@^1.1.5": "1.1.5",
+    "npm:chalk@^5.6.2": "5.6.2",
+    "npm:color-diff@^1.4.0": "1.4.0",
     "npm:suncalc@2": "2.0.0",
     "npm:zx@^8.8.5": "8.8.5"
   },
@@ -26,6 +28,12 @@
     }
   },
   "npm": {
+    "chalk@5.6.2": {
+      "integrity": "sha512-7NzBL0rN6fMUW+f7A6Io4h40qQlG+xGmtMxfbnH/K7TAtt8JQWVQK+6g0UXKMeVJoyV5EkkNsErQ8pVD3bLHbA=="
+    },
+    "color-diff@1.4.0": {
+      "integrity": "sha512-4oDB/o78lNdppbaqrg0HjOp7pHmUc+dfCxWKWFnQg6AB/1dkjtBDop3RZht5386cq9xBUDRvDvSCA7WUlM9Jqw=="
+    },
     "suncalc@2.0.0": {
       "integrity": "sha512-RcO28GOMXNnB+sr+c7/+zv5UPMa9wxIsUVGE3HddjQykqCVEC2rc4t4IjBB7qaa7K7dx5Cxp8UZwexyXrX8JkA=="
     },
@@ -42,6 +50,7 @@
     "packageJson": {
       "dependencies": [
         "npm:chalk@^5.6.2",
+        "npm:color-diff@^1.4.0",
         "npm:suncalc@2",
         "npm:zx@^8.8.5"
       ]

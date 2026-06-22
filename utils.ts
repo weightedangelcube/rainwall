@@ -88,3 +88,11 @@ function easeOutQuint(x: number): number {
 export function mapEaseOutQuint(number: number, min: number, max: number, newMin: number, newMax: number) {
 	return easeOutQuint((number - min) / (max - min)) * (newMax - newMin) + newMin
 }
+
+function easeOutSqrt(x: number): number {
+	return Math.sqrt(x)
+}
+
+export function mapEaseOutSqrt(number: number, min: number, max: number, newMin: number, newMax: number) {
+	return easeOutSqrt((number - min) / (max - min)) * (newMax - newMin) + newMin
+}

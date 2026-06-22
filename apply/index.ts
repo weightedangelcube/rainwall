@@ -1,8 +1,8 @@
 #!/usr/bin/env zx
 
-import { ImageAnalysisData } from "../analyze/analysis.ts"
-import { cacheDir, chalkDebug, configDir, loadConfig, map, mapEaseOutQuint } from "../utils.ts"
-import { ApplicationConfig, defaultConfig, findMatchingImages, getOpenMeteoData } from "./application.ts"
+import type { ImageAnalysisData } from "../analyze/analysis.ts"
+import { cacheDir, chalkDebug, configDir, loadConfig, map, mapEaseOutQuint, mapEaseOutSqrt } from "../utils.ts"
+import { type ApplicationConfig, defaultConfig, findMatchingImages, getOpenMeteoData } from "./application.ts"
 import * as SunCalc from "suncalc"
 import "zx/globals"
 
@@ -57,7 +57,7 @@ const chromaValue = map(
 	config.chromaRange.end,
 )
 
-const lightnessValue = map(
+const lightnessValue = mapEaseOutSqrt(
 	Number(openMeteoData.shortwaveRadiation),
 	0,
 	1000,
@@ -74,8 +74,10 @@ const cacheFile = await fs.promises.readFile(`${pathToCache}`, {
 const imagesData = JSON.parse(cacheFile) as ImageAnalysisData
 console.debug(chalkDebug(`Opened cache file ${pathToCache}!`))
 
-const targetFile = findMatchingImages(imagesData, hueValue, chromaValue, lightnessValue)
+const targetImages = findMatchingImages(imagesData, hueValue, chromaValue, lightnessValue)
+const targetImage = targetImages[Math.floor(Math.random() * targetImages.length)]
+console.info(`Found target image ${targetImage.path} with colour oklch(${targetImage.oklch[0]} ${targetImage.oklch[1]} ${targetImage.oklch[2]})!`)
 
 console.info(`Setting wallpaper...`)
-await $`eval ${config.applyWallpaperCommand.replace("%s", targetFile.path)}`
+await $`eval ${config.applyWallpaperCommand.replace("%s", targetImage.path)}`
 console.info(`Success! Enjoy :)`)

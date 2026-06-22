@@ -1,4 +1,5 @@
 import type { ImageAnalysisData } from "../analyze/analysis.ts"
+import * as colourDiff from "color-diff"
 
 export interface ApplicationConfig {
 	latitude: number
@@ -77,19 +78,25 @@ export function findMatchingImages(
 	chromaValue: number,
 	lightnessValue: number,
 ) {
-	const targetColour = [lightnessValue, chromaValue, hueValue]
-	let closestColour = imagesData.files[0]
+	// let's convert Oklch to CIELAB first:
+	const aValue = chromaValue * Math.cos(hueValue)
+	const bValue = chromaValue * Math.sin(hueValue)
 
-	for (const file of imagesData.files) {
-		if (
-			Math.abs(file.oklch[0] - targetColour[0]) <= Math.abs(closestColour.oklch[0] - targetColour[0]) &&
-			Math.abs(file.oklch[1] - targetColour[1]) <= Math.abs(closestColour.oklch[1] - targetColour[1]) &&
-			Math.abs(file.oklch[2] - targetColour[2]) <= Math.abs(closestColour.oklch[2] - targetColour[2])
-		) {
-			closestColour = file
+	const matchingImages = []
+
+	let targetDifference = 0.07
+	while (matchingImages.length == 0) {
+		for (const image of imagesData.files) {
+			const targetAValue = image.oklch[1] * Math.cos(image.oklch[2])
+			const targetBValue = image.oklch[1] * Math.sin(image.oklch[2])
+			
+			// then use the CIEDE2000 algorithm to calculate the difference between the colours
+			const difference = colourDiff.diff({L: lightnessValue, a: aValue, b: bValue}, {L: image.oklch[0], a: targetAValue, b: targetBValue})
+			if (difference <= targetDifference) {
+				matchingImages.push(image)
+			}
 		}
-	}
-	console.info(`Found target image ${closestColour.path} with colour oklch(${closestColour.oklch[0]} ${closestColour.oklch[1]} ${closestColour.oklch[2]})!`)
-
-	return closestColour
+		targetDifference += 0.01
+	} 
+	return matchingImages
 }
