@@ -25,10 +25,10 @@ export async function analyzeImages(imageDir: string, analysisOutput: ImageAnaly
 	const images = await fs.promises.opendir(imageDir)
 
 	for await (const image of images) {
-		const path = `${imageDir}/${image.name}`
-		const stat = await fs.promises.stat(path)
+		const imagePath = path.join(imageDir, image.name)
+		const stat = await fs.promises.stat(imagePath)
 		if (stat.isFile()) {
-			let output = await $`magick ${path} -colorspace Oklch -kmeans 10 -format "%c" histogram:info:`.then(
+			let output = await $`magick ${imagePath} -colorspace Oklch -kmeans 10 -format "%c" histogram:info:`.then(
 				(s) =>
 					s.stdout
 						.split("\n")
@@ -41,7 +41,7 @@ export async function analyzeImages(imageDir: string, analysisOutput: ImageAnaly
 				console.log(
 					`-kmeans 10 of ${image.name} didn't give enough colours, trying again with a higher value...`,
 				)
-				output = await $`magick ${path} -colorspace Oklch -kmeans 40 -format "%c" histogram:info:`.then(
+				output = await $`magick ${imagePath} -colorspace Oklch -kmeans 40 -format "%c" histogram:info:`.then(
 					(s) =>
 						s.stdout
 							.split("\n") // split the output by newlines
@@ -72,7 +72,7 @@ export async function analyzeImages(imageDir: string, analysisOutput: ImageAnaly
 			const chroma = Number(dominantColour[1])
 			const hue = Number(dominantColour[2])
 
-			analysisOutput.files.push({ path: path, oklch: [lightness, chroma, hue] })
+			analysisOutput.files.push({ path: imagePath, oklch: [lightness, chroma, hue] })
 
 			// flush every time we finish analyzing a file, because it just takes so long
 			fs.writeFile(outputPath, JSON.stringify(analysisOutput, null, 4), (err: Error) => {
