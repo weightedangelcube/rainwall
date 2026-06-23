@@ -108,18 +108,10 @@ export function map(number: number, min: number, max: number, newMin: number, ne
 	return ((number - min) / (max - min)) * (newMax - newMin) + newMin
 }
 
-function easeOutQuint(x: number): number {
+export function easeOutQuint(x: number): number {
 	return 1 - Math.pow(1 - x, 5)
 }
 
-export function mapEaseOutQuint(number: number, min: number, max: number, newMin: number, newMax: number) {
-	return easeOutQuint((number - min) / (max - min)) * (newMax - newMin) + newMin
-}
-
-function easeOutExp(x: number, exp: number): number {
-	return Math.pow(x, exp)
-}
-
-export function mapEaseOutExp(number: number, exp: number, min: number, max: number, newMin: number, newMax: number) {
-	return easeOutExp((number - min) / (max - min), exp) * (newMax - newMin) + newMin
+export function mapEased(number: number, min: number, max: number, newMin: number, newMax: number, func: (n: number) => number) {
+	return func((number - min) / (max - min)) * (newMax - newMin) + newMin
 }

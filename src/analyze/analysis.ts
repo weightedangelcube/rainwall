@@ -1,5 +1,6 @@
 import * as path from "@std/path"
 import "zx/globals"
+import { colordx, type OklchColor } from "@colordx/core"
 
 export interface AnalysisConfig {
 	imageDir: string
@@ -7,7 +8,7 @@ export interface AnalysisConfig {
 }
 
 export interface ImageAnalysisData {
-	files: { path: string; oklch: number[] }[]
+	files: { path: string; colour: OklchColor }[]
 }
 
 export const defaultConfig: AnalysisConfig = {
@@ -63,16 +64,17 @@ export async function analyzeImages(imageDir: string, analysisOutput: ImageAnaly
 
 			colours.sort((a, b) => (b.pixels) - (a.pixels))
 
-			const dominantColour = colours[0].oklab
+			const dominantColour = colordx({
+				l: Number(colours[0].oklab[0]),
+				c: Number(colours[0].oklab[1]),
+				h: Number(colours[0].oklab[2]),
+			})
+
+			analysisOutput.files.push({ path: imagePath, colour: dominantColour.toOklch() })
 
 			console.log(
-				`Got oklch(${dominantColour}) as dominant colour of ${image.name}!`,
+				`Got ${dominantColour.toOklchString()} as dominant colour of ${image.name}!`,
 			)
-			const lightness = Number(dominantColour[0])
-			const chroma = Number(dominantColour[1])
-			const hue = Number(dominantColour[2])
-
-			analysisOutput.files.push({ path: imagePath, oklch: [lightness, chroma, hue] })
 
 			// flush every time we finish analyzing a file, because it just takes so long
 			fs.writeFile(outputPath, JSON.stringify(analysisOutput, null, 4), (err: Error) => {

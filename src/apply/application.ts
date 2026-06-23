@@ -1,5 +1,9 @@
+import { type Colordx, extend } from "@colordx/core"
+import lab from "@colordx/core/plugins/lab"
 import type { ImageAnalysisData } from "../analyze/analysis.ts"
-import * as colourDiff from "color-diff"
+import { chalkDebug } from "../utils.ts"
+
+extend([lab])
 
 export interface ApplicationConfig {
 	latitude: number
@@ -72,40 +76,19 @@ export async function getOpenMeteoData(
 	}
 }
 
-export function findMatchingImages(
-	imagesData: ImageAnalysisData,
-	hueValue: number,
-	chromaValue: number,
-	lightnessValue: number,
-) {
-	// let's convert Oklch to CIELAB first:
-	const aValue = chromaValue * Math.cos(hueValue)
-	const bValue = chromaValue * Math.sin(hueValue)
-
+export function findMatchingImages(imagesData: ImageAnalysisData, targetColor: Colordx) {
 	const matchingImages = []
 
-	let targetDifference = 0.05
+	let targetDelta = 0.06
 	while (matchingImages.length == 0) {
+		console.debug(`Finding matching image with delta E ${targetDelta.toFixed(2)}...`)
 		for (const image of imagesData.files) {
-			const targetAValue = image.oklch[1] * Math.cos(image.oklch[2])
-			const targetBValue = image.oklch[1] * Math.sin(image.oklch[2])
-
-			// then use the CIEDE2000 algorithm to calculate the difference between the colours
-			const difference = colourDiff.diff({
-				L: lightnessValue,
-				a: aValue,
-				b: bValue,
-			}, {
-				L: image.oklch[0],
-				a: targetAValue,
-				b: targetBValue,
-			})
-
-			if (difference <= targetDifference) {
+			if (targetColor.delta(image.colour) <= targetDelta) {
 				matchingImages.push(image)
 			}
 		}
-		targetDifference += 0.01
+		console.info(chalkDebug(`Couldn't find matching image with delta E ${targetDelta.toFixed(2)}! Increasing...`))
+		targetDelta += 0.01
 	}
 	return matchingImages
 }

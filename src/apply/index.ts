@@ -1,13 +1,13 @@
+import { colordx } from "@colordx/core"
 import type { ImageAnalysisData } from "../analyze/analysis.ts"
 import {
 	applyConfigPath,
 	cachePath,
 	chalkDebug,
+	easeOutQuint,
 	loadConfig,
 	map,
-	mapEaseOutExp,
-	mapEaseOutQuint,
-	windowsApplyScriptPath,
+	mapEased,
 } from "../utils.ts"
 import { type ApplicationConfig, defaultConfig, findMatchingImages, getOpenMeteoData } from "./application.ts"
 import * as SunCalc from "suncalc"
@@ -50,8 +50,8 @@ console.info(
 console.info(`Current sun altitude is ${currentSunData.altitude}°!`)
 
 const hueValue = Number(currentSunData.altitude) >= -0.833
-	? mapEaseOutQuint(Number(currentSunData.altitude), -0.833, zenithSunData.altitude, 0, 264)
-	: mapEaseOutQuint(Number(currentSunData.altitude), nadirSunData.altitude, -0.833, 264, 360)
+	? mapEased(Number(currentSunData.altitude), -0.833, zenithSunData.altitude, 0, 264, (x: number) => easeOutQuint(x))
+	: mapEased(Number(currentSunData.altitude), nadirSunData.altitude, -0.833, 264, 360, (x: number) => easeOutQuint(x))
 
 const chromaValue = map(
 	100 - Number(openMeteoData.cloudCover), // gotta invert this one
@@ -61,16 +61,24 @@ const chromaValue = map(
 	config.chromaRange.end,
 )
 
-const lightnessValue = mapEaseOutExp(
+let lightnessValue = mapEased(
 	Number(openMeteoData.shortwaveRadiation),
-	1 / 4,
 	0,
 	1000,
 	config.lightnessRange.start,
 	config.lightnessRange.end,
+	(x: number) => Math.pow(x, 1/4),
 )
 
-console.info(`Calculated target colour oklch(${lightnessValue} ${chromaValue} ${hueValue})!`)
+// if the current sun altitude is less than that of dawn/dusk
+if (currentSunData.altitude < SunCalc.times.find((element) => element.includes("dawn"))![0]) {
+	// no light, the sun hasn't even risen yet
+	lightnessValue = config.lightnessRange.start
+}
+
+const targetColour = colordx({ l: lightnessValue, c: chromaValue, h: hueValue })
+
+console.info(`Calculated target colour ${targetColour.toOklchString()}!`)
 
 console.debug(chalkDebug(`Trying to open cache file ${cachePath}...`))
 const cacheFile = await fs.promises.readFile(`${cachePath}`, {
@@ -79,18 +87,16 @@ const cacheFile = await fs.promises.readFile(`${cachePath}`, {
 const imagesData = JSON.parse(cacheFile) as ImageAnalysisData
 console.debug(chalkDebug(`Opened cache file ${cachePath}!`))
 
-const targetImages = findMatchingImages(imagesData, hueValue, chromaValue, lightnessValue)
-const targetImage = targetImages[Math.floor(Math.random() * targetImages.length)]
+const matchingImages = findMatchingImages(imagesData, targetColour)
+const matchingImage = matchingImages[Math.floor(Math.random() * matchingImages.length)]
 console.info(
-	`Found target image ${targetImage.path} with colour oklch(${targetImage.oklch[0]} ${targetImage.oklch[1]} ${
-		targetImage.oklch[2]
-	})!`,
+	`Found matching image ${matchingImage.path} with colour ${colordx(matchingImage.colour).toOklchString()}!`,
 )
 
 console.info(`Setting wallpaper...`)
 
 if (Deno.build.os != "windows") {
-	await $`eval ${config.applyWallpaperCommand.replace("%s", targetImage.path)}`
+	await $`eval ${config.applyWallpaperCommand.replace("%s", matchingImage.path)}`
 } else {
 	const command = new Deno.Command(`pwsh`, { args: [ windowsApplyScriptPath, targetImage.path ], stdout: "piped" } )
 	command.spawn()
