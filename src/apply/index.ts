@@ -98,7 +98,29 @@ console.info(`Setting wallpaper...`)
 if (Deno.build.os != "windows") {
 	await $`eval ${config.applyWallpaperCommand.replace("%s", matchingImage.path)}`
 } else {
-	const command = new Deno.Command(`pwsh`, { args: [ windowsApplyScriptPath, targetImage.path ], stdout: "piped" } )
-	command.spawn()
+	const command = `
+$setwallpapersrc = @"
+using System.Runtime.InteropServices;
+public class Wallpaper {
+	public const int SetDesktopWallpaper = 20;
+	public const int UpdateIniFile = 0x01;
+	public const int SendWinIniChange = 0x02;
+
+	[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+	private static extern int SystemParametersInfo(int uAction, int uParam, string lpvParam, int fuWinIni);
+
+	public static void SetWallpaper (string path) {
+		SystemParametersInfo(SetDesktopWallpaper, 0, path, UpdateIniFile | SendWinIniChange);
+	}
 }
+"@
+Add-Type -TypeDefinition $setwallpapersrc
+
+[Wallpaper]::SetWallpaper("${matchingImage.path}")
+`
+	usePowerShell()
+	// await $`Write-Host ${command}`
+	await $`${command} | iex`
+}
+
 console.info(`Success! Enjoy :)`)

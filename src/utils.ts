@@ -35,34 +35,6 @@ if (!fs.statSync(path.fromFileUrl(`file:///${getCachePath()}`), { throwIfNoEntry
 export const applyConfigPath = path.fromFileUrl(`file:///${getConfigPath()}/apply-config.json`)
 export const analyzeConfigPath = path.fromFileUrl(`file:///${getConfigPath()}/analyze-config.json`)
 export const cachePath = path.fromFileUrl(`file:///${getCachePath()}/analysis.json`)
-export const windowsApplyScriptPath = path.fromFileUrl(`file:///${getConfigPath()}/setWallpaper.ps1`)
-
-if (!fs.statSync(windowsApplyScriptPath, { throwIfNoEntry: false })) {
-	// C# in TypeScript. who would've thought
-	const command = `
-$imagePath = $args[0]
-$setwallpapersrc = @"
-using System.Runtime.InteropServices;
-public class wallpaper {
-	public const int SetDesktopWallpaper = 20;
-	public const int UpdateIniFile = 0x01;
-	public const int SendWinIniChange = 0x02;
-
-	[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-	private static extern int SystemParametersInfo (int uAction, int uParam, string lpvParam, int fuWinIni);
-
-	public static void SetWallpaper (string path) {
-		SystemParametersInfo(SetDesktopWallpaper, 0, path, UpdateIniFile | SendWinIniChange);
-	}
-}
-"@
-Add-Type -TypeDefinition $setwallpapersrc
-
-[wallpaper]::SetWallpaper("$imagePath")
-	`
-	await fs.writeFile(windowsApplyScriptPath, command)
-	console.info(`Wrote Windows wallpaper apply script at ${windowsApplyScriptPath}!`)
-}
 
 export async function loadConfig(pathToConfig: string, defaultConfig: object) {
 	let config: object | undefined
@@ -112,6 +84,13 @@ export function easeOutQuint(x: number): number {
 	return 1 - Math.pow(1 - x, 5)
 }
 
-export function mapEased(number: number, min: number, max: number, newMin: number, newMax: number, func: (n: number) => number) {
+export function mapEased(
+	number: number,
+	min: number,
+	max: number,
+	newMin: number,
+	newMax: number,
+	func: (n: number) => number,
+) {
 	return func((number - min) / (max - min)) * (newMax - newMin) + newMin
 }
