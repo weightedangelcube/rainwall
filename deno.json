@@ -7,10 +7,10 @@
     "./apply": "./apply/index.ts"
   },
   "tasks": {
-    "compile-analyze": "deno compile --output build/rainwall-analyze -A analyze/index.ts",
-    "compile-apply": "deno compile --output build/rainwall-apply -A apply/index.ts",
-    "analyze": "deno -A analyze/index.ts",
-    "apply": "deno -A apply/index.ts"
+    "compile-analyze": "deno compile --output build/rainwall-analyze -A ./src/analyze/index.ts",
+    "compile-apply": "deno compile --output build/rainwall-apply -A ./src/apply/index.ts",
+    "analyze": "deno -A ./src/analyze/index.ts",
+    "apply": "deno -A ./src/apply/index.ts"
   },
   "imports": {
     "@std/assert": "jsr:@std/assert@1",

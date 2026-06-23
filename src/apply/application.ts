@@ -84,7 +84,7 @@ export function findMatchingImages(
 
 	const matchingImages = []
 
-	let targetDifference = 0.07
+	let targetDifference = 0.05
 	while (matchingImages.length == 0) {
 		for (const image of imagesData.files) {
 			const targetAValue = image.oklch[1] * Math.cos(image.oklch[2])

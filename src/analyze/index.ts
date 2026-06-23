@@ -1,7 +1,7 @@
 #!/usr/bin/env zx
 
 import { cacheDir, chalkDebug, configDir, loadConfig } from "../utils.ts"
-import { AnalysisConfig, analyzeImages, defaultConfig, ImageAnalysisData, runPreAnalysis } from "./analysis.ts"
+import { type AnalysisConfig, analyzeImages, defaultConfig, type ImageAnalysisData, runPreAnalysis } from "./analysis.ts"
 import "zx/globals"
 
 const pathToConfig = `${configDir}/analyze-config.json`
