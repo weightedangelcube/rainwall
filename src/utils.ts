@@ -89,10 +89,10 @@ export function mapEaseOutQuint(number: number, min: number, max: number, newMin
 	return easeOutQuint((number - min) / (max - min)) * (newMax - newMin) + newMin
 }
 
-function easeOutSqrt(x: number): number {
-	return Math.sqrt(x)
+function easeOutExp(x: number, exp: number): number {
+	return Math.pow(x, exp);
 }
 
-export function mapEaseOutSqrt(number: number, min: number, max: number, newMin: number, newMax: number) {
-	return easeOutSqrt((number - min) / (max - min)) * (newMax - newMin) + newMin
+export function mapEaseOutExp(number: number, exp: number, min: number, max: number, newMin: number, newMax: number) {
+	return easeOutExp((number - min) / (max - min), exp) * (newMax - newMin) + newMin
 }

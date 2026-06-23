@@ -1,7 +1,5 @@
-#!/usr/bin/env zx
-
 import type { ImageAnalysisData } from "../analyze/analysis.ts"
-import { cacheDir, chalkDebug, configDir, loadConfig, map, mapEaseOutQuint, mapEaseOutSqrt } from "../utils.ts"
+import { cacheDir, chalkDebug, configDir, loadConfig, map, mapEaseOutExp, mapEaseOutQuint } from "../utils.ts"
 import { type ApplicationConfig, defaultConfig, findMatchingImages, getOpenMeteoData } from "./application.ts"
 import * as SunCalc from "suncalc"
 import "zx/globals"
@@ -57,8 +55,9 @@ const chromaValue = map(
 	config.chromaRange.end,
 )
 
-const lightnessValue = mapEaseOutSqrt(
+const lightnessValue = mapEaseOutExp(
 	Number(openMeteoData.shortwaveRadiation),
+	1 / 4,
 	0,
 	1000,
 	config.lightnessRange.start,
