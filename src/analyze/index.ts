@@ -22,7 +22,6 @@ if (fs.statSync(cachePath)) {
 	await fs.cp(cachePath, `${cachePath}.bak`, { force: true })
 }
 
-
 const imageData = { files: [] } as ImageAnalysisData
 
 await runPreAnalysis(config.preAnalysisCommands)

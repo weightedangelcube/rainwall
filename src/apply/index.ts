@@ -1,14 +1,6 @@
 import { colordx } from "@colordx/core"
 import type { ImageAnalysisData } from "../analyze/analysis.ts"
-import {
-	applyConfigPath,
-	cachePath,
-	chalkDebug,
-	easeOutQuint,
-	loadConfig,
-	map,
-	mapEased,
-} from "../utils.ts"
+import { applyConfigPath, cachePath, chalkDebug, easeOutQuint, loadConfig, map, mapEased } from "../utils.ts"
 import { type ApplicationConfig, defaultConfig, findMatchingImages, getOpenMeteoData } from "./application.ts"
 import * as SunCalc from "suncalc"
 import "zx/globals"
@@ -44,9 +36,7 @@ const nadirSunData = SunCalc.getPosition(
 )
 
 console.info(`Current cloud cover percentage is ${openMeteoData.cloudCover}%!`)
-console.info(
-	`Current shortwave radiation is ${openMeteoData.shortwaveRadiation} W/m²!`,
-)
+console.info(`Current shortwave radiation is ${openMeteoData.shortwaveRadiation} W/m²!`)
 console.info(`Current sun altitude is ${currentSunData.altitude}°!`)
 
 const hueValue = Number(currentSunData.altitude) >= -0.833
@@ -67,7 +57,7 @@ let lightnessValue = mapEased(
 	1000,
 	config.lightnessRange.start,
 	config.lightnessRange.end,
-	(x: number) => Math.pow(x, 1/4),
+	(x: number) => Math.pow(x, 1 / 4),
 )
 
 // if the current sun altitude is less than that of dawn/dusk
