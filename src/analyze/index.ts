@@ -6,7 +6,6 @@ import {
 	type ImageAnalysisData,
 	runPreAnalysis,
 } from "./analysis.ts"
-import * as path from "@std/path"
 import "zx/globals"
 
 console.debug(chalkDebug(`Trying to load config from ${analyzeConfigPath}...`))
@@ -29,6 +28,6 @@ const imageData = { files: [] } as ImageAnalysisData
 
 await runPreAnalysis(config.preAnalysisCommands)
 
-await analyzeImages(path.fromFileUrl(config.imageDir), imageData, cachePath)
+await analyzeImages(config.imageDir, imageData, cachePath)
 
-await fs.rm(path.fromFileUrl(`${cachePath}.bak`), { force: true })
+await fs.rm(`${cachePath}.bak`, { force: true })
