@@ -13,12 +13,14 @@ cloud cover, and sun angle, which correspond to lightness, chroma, and hue respe
 ## dependencies
 
 - [ImageMagick](https://imagemagick.org)
+- Bash
 
 ## installing
 
-First, install [ImageMagick](https://imagemagick.org) using your method of choice. Then download the binary from
-[Releases on GitHub](https://github.com/weightedangelcube/rainwall/releases), or get it from
-[JSR](https://jsr.io/@angelcube/rainwall/).
+First, install [ImageMagick](https://imagemagick.org) using your method of choice. If you're on Windows, install Bash
+either via [Git Bash](https://git-scm.com/install/) or [WSL](https://learn.microsoft.com/en-us/windows/wsl/install).
+Then download the binary from [Releases on GitHub](https://github.com/weightedangelcube/rainwall/releases), or get it
+from [JSR](https://jsr.io/@angelcube/rainwall/).
 
 Alternatively, if you are using Arch Linux, you can use the PKGBUILD in the repository root to do both for you.
 
