@@ -23,6 +23,9 @@ jobs:
               with:
                   deno-version: v2.8.x
 
+            - name: Install Deno packages
+              run: deno install
+
             - name: Run linter
               run: deno lint
 
