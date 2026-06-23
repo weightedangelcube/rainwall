@@ -15,6 +15,12 @@ cloud cover, and sun angle, which correspond to lightness, chroma, and hue respe
 - [ImageMagick](https://imagemagick.org)
 - Bash
 
+## compatibility
+
+- Linux ✅
+- Darwin (macOS/OSX) ❓
+- Windows ✅
+
 ## installing
 
 First, install [ImageMagick](https://imagemagick.org) using your method of choice. If you're on Windows, install Bash
@@ -45,14 +51,14 @@ Alternatively, if you are using Arch Linux, you can use the PKGBUILD in the repo
 
 ### `apply-config.json`
 
-| option                  | typeof                           | default                            | description                                                                                                                                                        |
-| ----------------------- | -------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `latitude`              | `number`                         | `0`                                | The latitude used to discover the weather outside.                                                                                                                 |
-| `longitude`             | `number`                         | `0`                                | The longitude used to discover the weather outside.                                                                                                                |
-| `weatherModel`          | `string`                         | `"best_match"`                     | The weather model to calculate cloud cover and shortwave radiation with. Find the options on the [Open-Meteo](https://open-meteo.com/en/docs) site.                |
-| `lightnessRange`        | `{ start: number; end: number }` | `{ start: 0; end: 1 }`             | The range of lightness values to map shortwave radiation to. Use this if your images are all exceptionally light or dark, due to post-processing or other reasons. |
-| `chromaRange`           | `{ start: number; end: number }` | `{ start: 0; end: 1 }`             | The range of chroma values to map cloud cover to. Use this if your images are all exceptionally saturated or desaturated, due to post-processing or other reasons. |
-| `applyWallpaperCommand` | `string`                         | `hyprctl hyprpaper wallpaper , %s` | The command used to apply the wallpaper. See "applying the wallpaper" section below for more info.                                                                 |
+| option                  | typeof                           | default                            | description                                                                                                                                                                                                                                            |
+| ----------------------- | -------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `latitude`              | `number`                         | `0`                                | The latitude used to discover the weather outside.                                                                                                                                                                                                     |
+| `longitude`             | `number`                         | `0`                                | The longitude used to discover the weather outside.                                                                                                                                                                                                    |
+| `weatherModel`          | `string`                         | `"best_match"`                     | The weather model to calculate cloud cover and shortwave radiation with. Find the options on the [Open-Meteo](https://open-meteo.com/en/docs) site.                                                                                                    |
+| `lightnessRange`        | `{ start: number; end: number }` | `{ start: 0; end: 0.8 }`           | The range of lightness values to map shortwave radiation to. Usually, the maximum lightness of the sky on a sunny day will usually only be 0.8. Edit this if your images are all exceptionally light or dark, due to post-processing or other reasons. |
+| `chromaRange`           | `{ start: number; end: number }` | `{ start: 0; end: 1 }`             | The range of chroma values to map cloud cover to. Edit this if your images are all exceptionally saturated or desaturated, due to post-processing or other reasons.                                                                                    |
+| `applyWallpaperCommand` | `string`                         | `hyprctl hyprpaper wallpaper , %s` | The command used to apply the wallpaper. **Unused on Windows.** See "applying the wallpaper" section below for more info.                                                                                                                              |
 
 ## applying the wallpaper
 
@@ -82,12 +88,5 @@ config file: `automator -i "%s" /path/to/your.workflow`
 
 ### Windows
 
-...who knows?
-
-## compatibility
-
-- Linux ✅
-- Darwin (macOS/OSX) ❓
-- Windows ❌
-  - [ ] How does one set the wallpaper via CLI?
-  - [ ] `apply/index.ts @ L80, analyze/analysis.ts @ L20`: equivalent of POSIX eval?
+`applyWallpaperCommand` is hardcoded to execute a PowerShell script, ensure ExecutionPolicy is at least RemoteSigned.
+Otherwise, the application should work out of the box.
