@@ -18,11 +18,10 @@ if (config == undefined) {
 
 console.debug(chalkDebug(`Config: \n${JSON.stringify(config, null, 4)}`))
 
-await fs.cp(cachePath, `${cachePath}.bak`, { force: true }, (err: Error) => {
-	if (err) {
-		console.log(err)
-	}
-})
+if (fs.statSync(cachePath)) {
+	await fs.cp(cachePath, `${cachePath}.bak`, { force: true })
+}
+
 
 const imageData = { files: [] } as ImageAnalysisData
 
@@ -30,4 +29,6 @@ await runPreAnalysis(config.preAnalysisCommands)
 
 await analyzeImages(config.imageDir, imageData, cachePath)
 
-await fs.rm(`${cachePath}.bak`, { force: true })
+if (fs.statSync(`${cachePath}.bak`)) {
+	await fs.rm(`${cachePath}.bak`, { force: true })
+}
