@@ -41,7 +41,7 @@ export async function getOpenMeteoData(
 				current: "cloud_cover",
 				minutely_15: "shortwave_radiation_instant",
 				forecast_minutely_15: "1",
-				past_minutely_15: "1"
+				past_minutely_15: "1",
 			}),
 		},
 	)
@@ -89,14 +89,23 @@ export function findMatchingImages(
 		for (const image of imagesData.files) {
 			const targetAValue = image.oklch[1] * Math.cos(image.oklch[2])
 			const targetBValue = image.oklch[1] * Math.sin(image.oklch[2])
-			
+
 			// then use the CIEDE2000 algorithm to calculate the difference between the colours
-			const difference = colourDiff.diff({L: lightnessValue, a: aValue, b: bValue}, {L: image.oklch[0], a: targetAValue, b: targetBValue})
+			const difference = colourDiff.diff({
+				L: lightnessValue,
+				a: aValue,
+				b: bValue,
+			}, {
+				L: image.oklch[0],
+				a: targetAValue,
+				b: targetBValue,
+			})
+
 			if (difference <= targetDifference) {
 				matchingImages.push(image)
 			}
 		}
 		targetDifference += 0.01
-	} 
+	}
 	return matchingImages
 }
