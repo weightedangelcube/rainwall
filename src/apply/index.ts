@@ -1,5 +1,5 @@
 import type { ImageAnalysisData } from "../analyze/analysis.ts"
-import { applyConfigPath, cachePath, chalkDebug, loadConfig, map, mapEaseOutExp, mapEaseOutQuint } from "../utils.ts"
+import { applyConfigPath, cachePath, chalkDebug, loadConfig, map, mapEaseOutExp, mapEaseOutQuint, windowsApplyScriptPath } from "../utils.ts"
 import { type ApplicationConfig, defaultConfig, findMatchingImages, getOpenMeteoData } from "./application.ts"
 import * as SunCalc from "suncalc"
 import "zx/globals"
@@ -83,29 +83,6 @@ console.info(`Setting wallpaper...`)
 if (Deno.build.os != "windows") {
 	await $`eval ${config.applyWallpaperCommand.replace("%s", targetImage.path)}`
 } else {
-	// C# in TypeScript. who would've thought
-	// uiAction: SPI_SetDeskWallpaper = 0x0014 = 20
-	// uiParam: unused = 0
-	// pvParam: path to the image
-	// fWinIni: SPIF_SENDCHANGE (update user profile + broadcast setting change) = 0x02 = 2
-	const command = `
-		$code = @' 
-		using System.Runtime.InteropServices; 
-			namespace Win32 { 
-				public class Wallpaper { 
-					[DllImport("user32.dll", CharSet=CharSet.Auto)] 
-					static extern int SystemParametersInfoA(int uiAction, int uiParam, string pvParam, int fWinIni);
-					
-					public static void SetWallpaper(string imagePath){ 
-						SystemParametersInfo(20, 0, imagePath, 2);
-					}
-				}
-			}
-		'@
-
-		add-type $code 
-		[Win32.Wallpaper]::SetWallpaper(${targetImage.path})
-	`
-	await $`pwsh ${command}`
+	await $`pwsh ${windowsApplyScriptPath}`
 }
 console.info(`Success! Enjoy :)`)

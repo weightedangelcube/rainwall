@@ -23,17 +23,48 @@ function getCachePath() {
 	}
 }
 
-export const applyConfigPath = path.fromFileUrl(`file:///${getConfigPath()}/apply-config.json`)
-export const analyzeConfigPath = path.fromFileUrl(`file:///${getConfigPath()}/analyze-config.json`)
-export const cachePath = path.fromFileUrl(`file:///${getCachePath()}/analysis.json`)
-
 // ensure the config and cache directories exist
-if (!fs.statSync(path.fromFileUrl(`file:///${getConfigPath()}`))) {
+if (!fs.statSync(path.fromFileUrl(`file:///${getConfigPath()}`), { throwIfNoEntry: false })) {
 	fs.mkdirSync(path.fromFileUrl(`file:///${getConfigPath()}`), { recursive: true })
 }
 
-if (!fs.statSync(path.fromFileUrl(`file:///${getCachePath()}`))) {
+if (!fs.statSync(path.fromFileUrl(`file:///${getCachePath()}`), { throwIfNoEntry: false })) {
 	fs.mkdirSync(path.fromFileUrl(`file:///${getCachePath()}`), { recursive: true })
+}
+
+export const applyConfigPath = path.fromFileUrl(`file:///${getConfigPath()}/apply-config.json`)
+export const analyzeConfigPath = path.fromFileUrl(`file:///${getConfigPath()}/analyze-config.json`)
+export const cachePath = path.fromFileUrl(`file:///${getCachePath()}/analysis.json`)
+export const windowsApplyScriptPath = path.fromFileUrl(`file:///${getConfigPath()}/setWallpaper.ps1`)
+
+if (!fs.statSync(windowsApplyScriptPath, { throwIfNoEntry: false })) {
+	// C# in TypeScript. who would've thought
+	// uiAction: SPI_SetDeskWallpaper = 0x0014 = 20
+	// uiParam: unused = 0
+	// pvParam: path to the image
+	// fWinIni: SPIF_SENDCHANGE (update user profile + broadcast setting change) = 0x02 = 2
+
+	const command = `
+		$imagePath = $args[0]
+		$code = @' 
+		using System.Runtime.InteropServices; 
+			namespace Win32 { 
+				public class Wallpaper { 
+					[DllImport("user32.dll", CharSet=CharSet.Auto)] 
+					static extern int SystemParametersInfoA(int uiAction, int uiParam, string pvParam, int fWinIni);
+					
+					public static void SetWallpaper(string imagePath){ 
+						SystemParametersInfo(20, 0, imagePath, 2);
+					}
+				}
+			}
+		'@
+
+		add-type $code 
+		[Win32.Wallpaper]::SetWallpaper($imagePath)
+	`
+	await fs.writeFile(windowsApplyScriptPath, command)
+	console.info(`Wrote Windows wallpaper apply script at ${windowsApplyScriptPath}!`)
 }
 
 export async function loadConfig(pathToConfig: string, defaultConfig: object) {
