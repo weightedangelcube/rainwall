@@ -1,4 +1,4 @@
-import { analyzeConfigPath, chalkDebug, loadConfig } from "../utils.ts"
+import { analyzeConfigPath, cachePath, chalkDebug, loadConfig } from "../utils.ts"
 import {
 	type AnalysisConfig,
 	analyzeImages,
@@ -19,7 +19,7 @@ if (config == undefined) {
 
 console.debug(chalkDebug(`Config: \n${JSON.stringify(config, null, 4)}`))
 
-await fs.cp(analyzeConfigPath, `${analyzeConfigPath}.bak`, { force: true }, (err: Error) => {
+await fs.cp(cachePath, `${cachePath}.bak`, { force: true }, (err: Error) => {
 	if (err) {
 		console.log(err)
 	}
@@ -29,6 +29,6 @@ const imageData = { files: [] } as ImageAnalysisData
 
 await runPreAnalysis(config.preAnalysisCommands)
 
-await analyzeImages(path.fromFileUrl(`file:///${config.imageDir}`), imageData, analyzeConfigPath)
+await analyzeImages(path.fromFileUrl(config.imageDir), imageData, cachePath)
 
-await fs.rm(path.fromFileUrl(`${analyzeConfigPath}.bak`), { force: true })
+await fs.rm(path.fromFileUrl(`${cachePath}.bak`), { force: true })
