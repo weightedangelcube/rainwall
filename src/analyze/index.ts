@@ -1,14 +1,17 @@
-#!/usr/bin/env zx
-
-import { cacheDir, chalkDebug, configDir, loadConfig } from "../utils.ts"
-import { type AnalysisConfig, analyzeImages, defaultConfig, type ImageAnalysisData, runPreAnalysis } from "./analysis.ts"
+import { analyzeConfigPath, chalkDebug, loadConfig } from "../utils.ts"
+import {
+	type AnalysisConfig,
+	analyzeImages,
+	defaultConfig,
+	type ImageAnalysisData,
+	runPreAnalysis,
+} from "./analysis.ts"
+import * as path from "@std/path"
 import "zx/globals"
 
-const pathToConfig = `${configDir}/analyze-config.json`
+console.debug(chalkDebug(`Trying to load config from ${analyzeConfigPath}...`))
 
-console.debug(chalkDebug(`Trying to load config from ${pathToConfig}...`))
-
-const config = await loadConfig(pathToConfig, defaultConfig) as AnalysisConfig
+const config = await loadConfig(analyzeConfigPath, defaultConfig) as AnalysisConfig
 
 if (config == undefined) {
 	throw new Error("Couldn't initialize config!")
@@ -16,7 +19,7 @@ if (config == undefined) {
 
 console.debug(chalkDebug(`Config: \n${JSON.stringify(config, null, 4)}`))
 
-await fs.cp(`${cacheDir}/analysis.json`, `${cacheDir}/analysis.json.prev`, { force: true }, (err: Error) => {
+await fs.cp(analyzeConfigPath, `${analyzeConfigPath}.bak`, { force: true }, (err: Error) => {
 	if (err) {
 		console.log(err)
 	}
@@ -26,6 +29,6 @@ const imageData = { files: [] } as ImageAnalysisData
 
 await runPreAnalysis(config.preAnalysisCommands)
 
-await analyzeImages(config.imageDir, imageData, `${cacheDir}/analysis.json`)
+await analyzeImages(path.fromFileUrl(`file:///${config.imageDir}`), imageData, analyzeConfigPath)
 
-await fs.rm(`${cacheDir}/analysis.json.prev`, { force: true })
+await fs.rm(path.fromFileUrl(`${analyzeConfigPath}.bak`), { force: true })

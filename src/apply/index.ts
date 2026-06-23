@@ -1,15 +1,12 @@
 import type { ImageAnalysisData } from "../analyze/analysis.ts"
-import { cacheDir, chalkDebug, configDir, loadConfig, map, mapEaseOutExp, mapEaseOutQuint } from "../utils.ts"
+import { applyConfigPath, cachePath, chalkDebug, loadConfig, map, mapEaseOutExp, mapEaseOutQuint } from "../utils.ts"
 import { type ApplicationConfig, defaultConfig, findMatchingImages, getOpenMeteoData } from "./application.ts"
 import * as SunCalc from "suncalc"
 import "zx/globals"
 
-const pathToConfig = `${configDir}/apply-config.json`
-const pathToCache = `${cacheDir}/analysis.json`
-
-console.debug(chalkDebug(`Trying to load application config from ${pathToConfig}...`))
+console.debug(chalkDebug(`Trying to load application config from ${applyConfigPath}...`))
 const config = await loadConfig(
-	pathToConfig,
+	applyConfigPath,
 	defaultConfig,
 ) as ApplicationConfig
 if (config == undefined) {
@@ -66,12 +63,12 @@ const lightnessValue = mapEaseOutExp(
 
 console.info(`Calculated target colour oklch(${lightnessValue} ${chromaValue} ${hueValue})!`)
 
-console.debug(chalkDebug(`Trying to open cache file ${pathToCache}...`))
-const cacheFile = await fs.promises.readFile(`${pathToCache}`, {
+console.debug(chalkDebug(`Trying to open cache file ${cachePath}...`))
+const cacheFile = await fs.promises.readFile(`${cachePath}`, {
 	encoding: "utf8",
 })
 const imagesData = JSON.parse(cacheFile) as ImageAnalysisData
-console.debug(chalkDebug(`Opened cache file ${pathToCache}!`))
+console.debug(chalkDebug(`Opened cache file ${cachePath}!`))
 
 const targetImages = findMatchingImages(imagesData, hueValue, chromaValue, lightnessValue)
 const targetImage = targetImages[Math.floor(Math.random() * targetImages.length)]

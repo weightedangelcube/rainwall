@@ -3,38 +3,37 @@ import "zx/globals"
 
 function getConfigPath() {
 	if (Deno.build.os == "windows") {
-		return path.fromFileUrl(`file:///${os.homedir}/AppData/Local/rainwall`)
+		return `${os.homedir}/AppData/Local/rainwall`
 	} else if (Deno.build.os == "darwin") {
-		return path.fromFileUrl(`file:///${os.homedir()}/Library/Preferences/rainwall`)
+		return `${os.homedir()}/Library/Preferences/rainwall`
 	} else {
 		return process.env.XDG_CONFIG_HOME
-			? path.fromFileUrl(`file:///${process.env.XDG_CONFIG_HOME}/rainwall`)
-			: path.fromFileUrl(`file:///${os.homedir()}/.config/rainwall`)
+			? `${process.env.XDG_CONFIG_HOME}/rainwall`
+			: `${os.homedir()}/.config/rainwall`
 	}
 }
 
 function getCachePath() {
 	if (Deno.build.os == "windows") {
-		return path.fromFileUrl(`file:///${os.homedir}/AppData/Local/Temp/rainwall`)
+		return `${os.homedir}/AppData/Local/Temp/rainwall`
 	} else if (Deno.build.os == "darwin") {
-		return path.fromFileUrl(`file:///${os.homedir()}/Library/Caches/rainwall`)
+		return `${os.homedir()}/Library/Caches/rainwall`
 	} else {
-		return process.env.XDG_CACHE_HOME
-			? path.fromFileUrl(`file:///${process.env.XDG_CACHE_HOME}/rainwall`)
-			: path.fromFileUrl(`file:///${os.homedir()}/.cache/rainwall`)
+		return process.env.XDG_CACHE_HOME ? `${process.env.XDG_CACHE_HOME}/rainwall` : `${os.homedir()}/.cache/rainwall`
 	}
 }
 
-export const configDir = getConfigPath()
+export const applyConfigPath = path.fromFileUrl(`file:///${getConfigPath()}/apply-config.json`)
+export const analyzeConfigPath = path.fromFileUrl(`file:///${getConfigPath()}/analyze-config.json`)
+export const cachePath = path.fromFileUrl(`file:///${getCachePath()}/analysis.json`)
 
-export const cacheDir = getCachePath()
-
-if (!fs.statSync(configDir)) {
-	fs.mkdirSync(configDir)
+// ensure the config and cache directories exist
+if (!fs.statSync(path.fromFileUrl(`file:///${getConfigPath()}`))) {
+	fs.mkdirSync(path.fromFileUrl(`file:///${getConfigPath()}`), { recursive: true })
 }
 
-if (!fs.statSync(cacheDir)) {
-	fs.mkdirSync(cacheDir)
+if (!fs.statSync(path.fromFileUrl(`file:///${getCachePath()}`))) {
+	fs.mkdirSync(path.fromFileUrl(`file:///${getCachePath()}`), { recursive: true })
 }
 
 export async function loadConfig(pathToConfig: string, defaultConfig: object) {
@@ -90,7 +89,7 @@ export function mapEaseOutQuint(number: number, min: number, max: number, newMin
 }
 
 function easeOutExp(x: number, exp: number): number {
-	return Math.pow(x, exp);
+	return Math.pow(x, exp)
 }
 
 export function mapEaseOutExp(number: number, exp: number, min: number, max: number, newMin: number, newMax: number) {

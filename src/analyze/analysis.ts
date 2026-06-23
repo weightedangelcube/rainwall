@@ -1,4 +1,4 @@
-#!/usr/bin/env zx
+import * as path from "@std/path"
 import "zx/globals"
 
 export interface AnalysisConfig {
@@ -11,7 +11,7 @@ export interface ImageAnalysisData {
 }
 
 export const defaultConfig: AnalysisConfig = {
-	imageDir: `${os.homedir()}/Pictures`,
+	imageDir: path.fromFileUrl(`file:///${os.homedir()}/Pictures`),
 	preAnalysisCommands: [],
 }
 
