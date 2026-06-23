@@ -1,5 +1,14 @@
 import type { ImageAnalysisData } from "../analyze/analysis.ts"
-import { applyConfigPath, cachePath, chalkDebug, loadConfig, map, mapEaseOutExp, mapEaseOutQuint, windowsApplyScriptPath } from "../utils.ts"
+import {
+	applyConfigPath,
+	cachePath,
+	chalkDebug,
+	loadConfig,
+	map,
+	mapEaseOutExp,
+	mapEaseOutQuint,
+	windowsApplyScriptPath,
+} from "../utils.ts"
 import { type ApplicationConfig, defaultConfig, findMatchingImages, getOpenMeteoData } from "./application.ts"
 import * as SunCalc from "suncalc"
 import "zx/globals"
@@ -83,6 +92,7 @@ console.info(`Setting wallpaper...`)
 if (Deno.build.os != "windows") {
 	await $`eval ${config.applyWallpaperCommand.replace("%s", targetImage.path)}`
 } else {
-	await $`pwsh ${windowsApplyScriptPath}`
+	const command = new Deno.Command(`pwsh`, { args: [ windowsApplyScriptPath, targetImage.path ], stdout: "piped" } )
+	command.spawn()
 }
 console.info(`Success! Enjoy :)`)

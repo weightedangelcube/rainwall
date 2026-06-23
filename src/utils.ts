@@ -39,29 +39,26 @@ export const windowsApplyScriptPath = path.fromFileUrl(`file:///${getConfigPath(
 
 if (!fs.statSync(windowsApplyScriptPath, { throwIfNoEntry: false })) {
 	// C# in TypeScript. who would've thought
-	// uiAction: SPI_SetDeskWallpaper = 0x0014 = 20
-	// uiParam: unused = 0
-	// pvParam: path to the image
-	// fWinIni: SPIF_SENDCHANGE (update user profile + broadcast setting change) = 0x02 = 2
-
 	const command = `
-		$imagePath = $args[0]
-		$code = @' 
-		using System.Runtime.InteropServices; 
-			namespace Win32 { 
-				public class Wallpaper { 
-					[DllImport("user32.dll", CharSet=CharSet.Auto)] 
-					static extern int SystemParametersInfoA(int uiAction, int uiParam, string pvParam, int fWinIni);
-					
-					public static void SetWallpaper(string imagePath){ 
-						SystemParametersInfo(20, 0, imagePath, 2);
-					}
-				}
-			}
-		'@
+$imagePath = $args[0]
+$setwallpapersrc = @"
+using System.Runtime.InteropServices;
+public class wallpaper {
+	public const int SetDesktopWallpaper = 20;
+	public const int UpdateIniFile = 0x01;
+	public const int SendWinIniChange = 0x02;
 
-		add-type $code 
-		[Win32.Wallpaper]::SetWallpaper($imagePath)
+	[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+	private static extern int SystemParametersInfo (int uAction, int uParam, string lpvParam, int fuWinIni);
+
+	public static void SetWallpaper (string path) {
+		SystemParametersInfo(SetDesktopWallpaper, 0, path, UpdateIniFile | SendWinIniChange);
+	}
+}
+"@
+Add-Type -TypeDefinition $setwallpapersrc
+
+[wallpaper]::SetWallpaper("$imagePath")
 	`
 	await fs.writeFile(windowsApplyScriptPath, command)
 	console.info(`Wrote Windows wallpaper apply script at ${windowsApplyScriptPath}!`)
