@@ -11,7 +11,7 @@ permissions:
     contents: read
 
 jobs:
-    test:
+    windows-x86_64:
         runs-on: ubuntu-latest
 
         steps:
@@ -29,38 +29,125 @@ jobs:
             - name: Run linter
               run: deno lint
 
-            - name: Build apply for x86_64 Linux
-              run: deno compile --target x86_64-unknown-linux-gnu --output build/rainwall-apply-linux-x86_64 -A ./src/apply/index.ts
+            - name: Build apply
+              run: deno compile --target x86_64-pc-windows-msvc --output build/rainwall-apply -A ./src/apply/index.ts
 
-            - name: Build apply for aarch64 Linux
-              run: deno compile --target aarch64-unknown-linux-gnu --output build/rainwall-apply-linux-aarch64 -A ./src/apply/index.ts
-
-            - name: Build apply for x86_64 Darwin
-              run: deno compile --target x86_64-apple-darwin --output build/rainwall-apply-darwin-x86_64 -A ./src/apply/index.ts
-
-            - name: Build apply for aarch64 darwin
-              run: deno compile --target aarch64-apple-darwin --output build/rainwall-apply-darwin-aarch64 -A ./src/apply/index.ts
-
-            - name: Build apply for x86_64 Windows
-              run: deno compile --target x86_64-pc-windows-msvc --output build/rainwall-apply-windows-x86_64 -A ./src/apply/index.ts
-
-            - name: Build analyze for x86_64 Linux
-              run: deno compile --target x86_64-unknown-linux-gnu --output build/rainwall-analyze-linux-x86_64 -A ./src/analyze/index.ts
-
-            - name: Build analyze for aarch64 Linux
-              run: deno compile --target aarch64-unknown-linux-gnu --output build/rainwall-analyze-linux-aarch64 -A ./src/analyze/index.ts
-
-            - name: Build analyze for x86_64 Darwin
-              run: deno compile --target x86_64-apple-darwin --output build/rainwall-analyze-darwin-x86_64 -A ./src/analyze/index.ts
-
-            - name: Build analyze for aarch64 darwin
-              run: deno compile --target aarch64-apple-darwin --output build/rainwall-analyze-darwin-aarch64 -A ./src/analyze/index.ts
-
-            - name: Build analyze for x86_64 Windows
-              run: deno compile --target x86_64-pc-windows-msvc --output build/rainwall-analyze-windows-x86_64 -A ./src/analyze/index.ts
+            - name: Build analyze
+              run: deno compile --target x86_64-pc-windows-msvc --output build/rainwall-analyze -A ./src/analyze/index.ts
 
             - name: Upload build artifacts
               uses: actions/upload-artifact@v4
               with:
-                  name: Build artifacts
+                  name: windows-x86_64
                   path: build/
+
+    linux-x86_64:
+        steps:
+            - name: Setup repo
+              uses: actions/checkout@v4
+
+            - name: Setup Deno
+              uses: denoland/setup-deno@61fe2df320078202e33d7d5ad347e7dcfa0e8f31 # v1.1.2
+              with:
+                  deno-version: v2.8.x
+
+            - name: Install Deno packages
+              run: deno install
+
+            - name: Run linter
+              run: deno lint
+
+            - name: Build apply
+              run: deno compile --target x86_64-unknown-linux-gnu --output build/rainwall-apply-linux-x86_64 -A ./src/apply/index.ts
+
+            - name: Build analyze
+              run: deno compile --target x86_64-unknown-linux-gnu --output build/rainwall-analyze-linux-x86_64 -A ./src/analyze/index.ts
+
+            - name: Upload build artifacts
+              uses: actions/upload-artifact@v4
+              with:
+                  name: linux-x86_64
+                  path: build/
+
+    linux-aarch64:
+        steps:
+            - name: Setup repo
+              uses: actions/checkout@v4
+
+            - name: Setup Deno
+              uses: denoland/setup-deno@61fe2df320078202e33d7d5ad347e7dcfa0e8f31 # v1.1.2
+              with:
+                  deno-version: v2.8.x
+
+            - name: Install Deno packages
+              run: deno install
+
+            - name: Run linter
+              run: deno lint
+
+            - name: Build apply
+              run: deno compile --target aarch64-unknown-linux-gnu --output build/rainwall-apply-linux-aarch64 -A ./src/apply/index.ts
+
+            - name: Build analyze
+              run: deno compile --target aarch64-unknown-linux-gnu --output build/rainwall-analyze-linux-aarch64 -A ./src/analyze/index.ts
+
+            - name: Upload build artifacts
+              uses: actions/upload-artifact@v4
+              with:
+                  name: linux-aarch64
+                  path: build/
+
+    darwin-x86_64:
+        steps:
+            - name: Setup repo
+              uses: actions/checkout@v4
+
+            - name: Setup Deno
+              uses: denoland/setup-deno@61fe2df320078202e33d7d5ad347e7dcfa0e8f31 # v1.1.2
+              with:
+                  deno-version: v2.8.x
+
+            - name: Install Deno packages
+              run: deno install
+
+            - name: Run linter
+              run: deno lint
+
+            - name: Build apply
+              run: deno compile --target x86_64-apple-darwin --output build/rainwall-apply -A ./src/apply/index.ts
+
+            - name: Build analyze
+              run: deno compile --target x86_64-apple-darwin --output build/rainwall-analyze -A ./src/analyze/index.ts
+
+            - name: Upload build artifacts
+              uses: actions/upload-artifact@v4
+              with:
+                  name: darwin-x86_64
+                  path: build/
+
+    darwin-aarch64:
+        - name: Setup repo
+          uses: actions/checkout@v4
+
+        - name: Setup Deno
+          uses: denoland/setup-deno@61fe2df320078202e33d7d5ad347e7dcfa0e8f31 # v1.1.2
+          with:
+              deno-version: v2.8.x
+
+        - name: Install Deno packages
+          run: deno install
+
+        - name: Run linter
+          run: deno lint
+
+        - name: Build apply
+          run: deno compile --target aarch64-apple-darwin --output build/rainwall-apply -A ./src/apply/index.ts
+
+        - name: Build analyze
+          run: deno compile --target aarch64-apple-darwin --output build/rainwall-analyze -A ./src/analyze/index.ts
+
+        - name: Upload build artifacts
+          uses: actions/upload-artifact@v4
+          with:
+              name: darwin-aarch64
+              path: build/
