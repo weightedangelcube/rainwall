@@ -1,11 +1,11 @@
 pkgname=rainwall-git
-pkgver=r20.b8de15c
+pkgver=r47.c87b8dd
 pkgrel=1
 pkgdesc="Apply a wallpaper based on the weather outside"
 arch=('any')
 url="https://github.com/weightedangelcube/rainwall"
 license=('GPL-3.0-only')
-depends=('imagemagick')
+depends=('imagemagick' 'bash')
 makedepends=('git' 'deno')
 provides=("${pkgname%-git}")
 conflicts=("${pkgname%-git}")
@@ -25,8 +25,8 @@ prepare() {
 
 build() {
     cd "$srcdir/${pkgname%-git}"
-    deno compile --output build/rainwall-analyze -A analyze/index.ts
-    deno compile --output build/rainwall-apply -A apply/index.ts
+    deno compile --output build/rainwall-analyze -A src/analyze/index.ts
+    deno compile --output build/rainwall-apply -A src/apply/index.ts
 }
 
 package() {
