@@ -37,33 +37,30 @@ export const analyzeConfigPath = path.fromFileUrl(`file:///${getConfigPath()}/an
 export const cachePath = path.fromFileUrl(`file:///${getCachePath()}/analysis.json`)
 
 export async function loadConfig(pathToConfig: string, defaultConfig: object) {
-	let config: object | undefined
-	try {
-		const stringConfig = await fs.promises.readFile(`${pathToConfig}`, {
-			encoding: "utf8",
-		})
-		if (stringConfig == undefined) {
-			console.log(
-				`Current config blank, generating a new one... you may need to stop this process and edit the config file.`,
-			)
-			config = defaultConfig
-			writeDefaultConfig(pathToConfig, defaultConfig)
-		} else {
-			config = JSON.parse(stringConfig)
+	let tries = 0
+	const maxTries = 3
+
+	while (tries < maxTries) {
+		try {
+			const stringConfig = await fs.promises.readFile(`${pathToConfig}`, {
+				encoding: "utf8",
+			})
+			const config = JSON.parse(stringConfig)
+			console.info(`Loaded config from ${pathToConfig}!`)
+			return config
+		} catch (err) {
+			console.warn(chalkWarn(
+				`Got ${(err as Error).message} when trying to load config, generating a new one... 
+				you may need to stop this process and edit the config file.`,
+			))
+			writeConfig(pathToConfig, defaultConfig)
+			tries++
+			if (tries == maxTries) throw new Error(`Couldn't read config in ${maxTries} tries`)
 		}
-	} catch (err) {
-		console.warn(chalkWarn(
-			`Got ${(err as Error).message} when trying to load config, generating a new one... 
-			you may need to stop this process and edit the config file.`,
-		))
-		config = defaultConfig
-		writeDefaultConfig(pathToConfig, defaultConfig)
 	}
-	console.info(`Loaded config from ${pathToConfig}!`)
-	return config
 }
 
-async function writeDefaultConfig(path: string, data: object) {
+async function writeConfig(path: string, data: object) {
 	await fs.writeFile(`${path}`, JSON.stringify(data, null, 4))
 	console.info(`Generated default config at ${path}!`)
 }
