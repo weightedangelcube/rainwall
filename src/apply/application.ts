@@ -9,8 +9,9 @@ export interface ApplicationConfig {
 	latitude: number
 	longitude: number
 	weatherModel: string
-	lightnessRange: { start: number; end: number }
+	lightnessRange: { night: number; dawn: number; noon: number }
 	chromaRange: { start: number; end: number }
+	targetSkyHue: number
 	applyWallpaperCommand: string
 }
 
@@ -19,13 +20,15 @@ export const defaultConfig: ApplicationConfig = {
 	longitude: 0,
 	weatherModel: "best_match",
 	lightnessRange: {
-		start: 0,
-		end: 0.8,
+		night: 0,
+		dawn: 0.3,
+		noon: 0.8,
 	},
 	chromaRange: {
 		start: 0,
 		end: 1,
 	},
+	targetSkyHue: 264,
 	applyWallpaperCommand: "hyprctl hyprpaper wallpaper , %s",
 }
 

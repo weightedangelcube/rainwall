@@ -14,6 +14,9 @@ if (config == undefined) {
 	throw new Error("Couldn't initialize config!")
 }
 
+const sunriseDegrees = SunCalc.times.find((element) => element.includes("sunrise"))![0]
+const dawnDegrees = SunCalc.times.find((element) => element.includes("dawn"))![0]
+
 const openMeteoData = await getOpenMeteoData(
 	config.latitude,
 	config.longitude,
@@ -39,9 +42,23 @@ console.info(`Current cloud cover percentage is ${openMeteoData.cloudCover}%!`)
 console.info(`Current shortwave radiation is ${openMeteoData.shortwaveRadiation} W/m²!`)
 console.info(`Current sun altitude is ${currentSunData.altitude}°!`)
 
-const hueValue = Number(currentSunData.altitude) >= -0.833
-	? mapEased(Number(currentSunData.altitude), -0.833, zenithSunData.altitude, 0, 264, (x: number) => easeOutQuint(x))
-	: mapEased(Number(currentSunData.altitude), nadirSunData.altitude, -0.833, 264, 360, (x: number) => easeOutQuint(x))
+const hueValue = Number(currentSunData.altitude) >= sunriseDegrees
+	? mapEased(
+		Number(currentSunData.altitude),
+		sunriseDegrees,
+		zenithSunData.altitude,
+		0,
+		config.targetSkyHue,
+		(x: number) => easeOutQuint(x),
+	)
+	: mapEased(
+		Number(currentSunData.altitude),
+		nadirSunData.altitude,
+		sunriseDegrees,
+		config.targetSkyHue,
+		360,
+		(x: number) => easeOutQuint(x),
+	)
 
 const chromaValue = map(
 	100 - Number(openMeteoData.cloudCover), // gotta invert this one
@@ -51,19 +68,18 @@ const chromaValue = map(
 	config.chromaRange.end,
 )
 
-let lightnessValue = mapEased(
+let lightnessValue = map(
 	Number(openMeteoData.shortwaveRadiation),
 	0,
 	1000,
-	config.lightnessRange.start,
-	config.lightnessRange.end,
-	(x: number) => Math.pow(x, 1 / 4),
+	config.lightnessRange.dawn,
+	config.lightnessRange.noon,
 )
 
 // if the current sun altitude is less than that of dawn/dusk
-if (currentSunData.altitude < SunCalc.times.find((element) => element.includes("dawn"))![0]) {
+if (currentSunData.altitude < dawnDegrees) {
 	// no light, the sun hasn't even risen yet
-	lightnessValue = config.lightnessRange.start
+	lightnessValue = config.lightnessRange.night
 }
 
 const targetColour = colordx({ l: lightnessValue, c: chromaValue, h: hueValue })
