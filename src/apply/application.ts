@@ -12,6 +12,7 @@ export interface ApplicationConfig {
 	lightnessRange: { night: number; dawn: number; noon: number }
 	chromaRange: { start: number; end: number }
 	targetSkyHue: number
+	numberOfWallpapers: number
 	applyWallpaperCommand: string
 }
 
@@ -28,6 +29,7 @@ export const defaultConfig: ApplicationConfig = {
 		start: 0,
 		end: 1,
 	},
+	numberOfWallpapers: 1,
 	targetSkyHue: 264,
 	applyWallpaperCommand: "hyprctl hyprpaper wallpaper , %s",
 }
@@ -79,11 +81,11 @@ export async function getOpenMeteoData(
 	}
 }
 
-export function findMatchingImages(imagesData: ImageAnalysisData, targetColor: Colordx) {
+export function findMatchingImages(imagesData: ImageAnalysisData, targetColor: Colordx, numberOfImages: number) {
 	const matchingImages = []
 
 	let targetDelta = 0.06
-	while (matchingImages.length == 0) {
+	while (matchingImages.length < numberOfImages) {
 		console.debug(`Finding matching image with delta E ${targetDelta.toFixed(2)}...`)
 		for (const image of imagesData.files) {
 			if (targetColor.delta(image.colour) <= targetDelta) {
@@ -94,4 +96,10 @@ export function findMatchingImages(imagesData: ImageAnalysisData, targetColor: C
 		targetDelta += 0.01
 	}
 	return matchingImages
+}
+
+export function setWindowsWallpaper() {
+	const user32 = Deno.dlopen("user32.dll", {
+		SystemParametersInfoA: { parameters: ["u16", "u16", "pointer", "u16"], result: "void" }
+	})
 }

@@ -1,6 +1,6 @@
 import { colordx } from "@colordx/core"
 import type { ImageAnalysisData } from "../analyze/analysis.ts"
-import { applyConfigPath, cachePath, chalkDebug, easeOutQuint, loadConfig, map, mapEased } from "../utils.ts"
+import { applyConfigPath, cachePath, chalkDebug, easeOutQuint, loadConfig, map, mapEased, shuffle } from "../utils.ts"
 import { type ApplicationConfig, defaultConfig, findMatchingImages, getOpenMeteoData } from "./application.ts"
 import * as SunCalc from "suncalc"
 import "zx/globals"
@@ -60,6 +60,7 @@ const hueValue = Number(currentSunData.altitude) >= sunriseDegrees
 		(x: number) => easeOutQuint(x),
 	)
 
+console.log(hueValue)
 const chromaValue = map(
 	100 - Number(openMeteoData.cloudCover), // gotta invert this one
 	0,
@@ -68,12 +69,13 @@ const chromaValue = map(
 	config.chromaRange.end,
 )
 
-let lightnessValue = map(
+let lightnessValue = mapEased(
 	Number(openMeteoData.shortwaveRadiation),
 	0,
 	1000,
 	config.lightnessRange.dawn,
 	config.lightnessRange.noon,
+	(x) => Math.pow(x, 1 / 4)
 )
 
 // if the current sun altitude is less than that of dawn/dusk
@@ -93,16 +95,23 @@ const cacheFile = await fs.promises.readFile(`${cachePath}`, {
 const imagesData = JSON.parse(cacheFile) as ImageAnalysisData
 console.debug(chalkDebug(`Opened cache file ${cachePath}!`))
 
-const matchingImages = findMatchingImages(imagesData, targetColour)
-const matchingImage = matchingImages[Math.floor(Math.random() * matchingImages.length)]
-console.info(
-	`Found matching image ${matchingImage.path} with colour ${colordx(matchingImage.colour).toOklchString()}!`,
+const matchingImages = shuffle(findMatchingImages(imagesData, targetColour, config.numberOfWallpapers)).slice(
+	0,
+	config.numberOfWallpapers,
 )
+
+matchingImages.forEach((image) =>
+	console.info(
+		`Found matching image ${image.path} with colour ${colordx(image.colour).toOklchString()}!`,
+	)
+)
+
+// TODO: implement setting more than one wallpaper. for ppl with multiple monitors
 
 console.info(`Setting wallpaper...`)
 
 if (Deno.build.os != "windows") {
-	await $`eval ${config.applyWallpaperCommand.replace("%s", matchingImage.path)}`
+	await $`eval ${config.applyWallpaperCommand.replace("%s", matchingImages[0].path)}`
 } else {
 	const command = `
 $setwallpapersrc = @"
@@ -122,7 +131,7 @@ public class Wallpaper {
 "@
 Add-Type -TypeDefinition $setwallpapersrc
 
-[Wallpaper]::SetWallpaper("${matchingImage.path}")
+[Wallpaper]::SetWallpaper("${matchingImages[0].path}")
 `
 	usePowerShell()
 	// await $`Write-Host ${command}`
