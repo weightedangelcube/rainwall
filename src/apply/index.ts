@@ -110,9 +110,8 @@ matchingImages.forEach((image) =>
 
 console.info(`Setting wallpaper...`)
 
-if (Deno.build.os != "windows") {
-	await $`eval ${config.applyWallpaperCommand.replace("%s", matchingImages[0].path)}`
-} else {
+	
+if (Deno.build.os == "windows") {
 	const command = `
 $setwallpapersrc = @"
 using System.Runtime.InteropServices;
@@ -136,6 +135,11 @@ Add-Type -TypeDefinition $setwallpapersrc
 	usePowerShell()
 	// await $`Write-Host ${command}`
 	await $`${command} | iex`
+} else if (Deno.build.os == "darwin") {
+	const command = `tell application "System Events" to set picture of (reference to current desktop) to "${matchingImages[0].path}"`
+	await $`osascript -e ${command}`
+} else {
+	await $`eval ${config.applyWallpaperCommand.replace("%s", matchingImages[0].path)}`
 }
 
 console.info(`Success! Enjoy :)`)
